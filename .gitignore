@@ -1,0 +1,13 @@
+# Test wiki.
+test/
+
+# Objects and other compilation artifacts.
+*.o
+uki
+
+# Debugging artifacts.
+valgrind*
+
+# Misc.
+.DS_Store
+
