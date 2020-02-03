@@ -17,7 +17,7 @@
 
 // Paths.
 #define UKI_MANIFEST_PATH "/MANIFEST.uki"
-#define UKI_ARTICLE_ROOT  "/articles/"
+#define UKI_ARTICLE_ROOT  "/pages/"
 #define UKI_ARTICLE_EXT   "html"
 
 // Misc.
