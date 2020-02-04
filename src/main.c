@@ -35,10 +35,19 @@ int main(const int argc, const char **argv) {
 		return 1;
 	}
 
-	// Print variables.
-	printf("Variables:\n");
+	// Print configurations.
 	uki_variable_t *var;
 	uint8_t iv = 0;
+	printf("Configurations:\n");
+	while (uki_config(iv, var)) {
+		printf("   %s <- %s\n", var->key, var->value);
+		iv++;
+	}
+	printf("\n");
+
+	// Print variables.
+	printf("Variables:\n");
+	iv = 0;
 	while (uki_variable(iv, var)) {
 		printf("   %s <- %s\n", var->key, var->value);
 		iv++;

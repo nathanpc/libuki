@@ -14,44 +14,34 @@
 
 // Private variables.
 char *wiki_root;
+uki_variable_container configs;
 uki_variable_container variables;
 
 // Private methods.
 bool file_exists(const char *fpath);
 long file_contents_size(const char *fname);
 size_t slurp_file(char **contents, const char *fname);
+int populate_variable_container(const char *wiki_root, const char *var_fname,
+								uki_variable_container *container);
 
 /**
  * Initializes the wiki.
  *
  * @param  wiki_path Path to the root of the uki wiki.
- * @return           UKI_OK if it's a valid uki wiki root.
+ * @return           UKI_OK if the initialization was completed successfully.
  */
 int uki_initialize(const char *wiki_path) {
-	// Get path string length and allocate some memory.
-	size_t rpath_len = strlen(wiki_path) + 1;
-	size_t vpath_len = rpath_len + strlen(UKI_VARIABLE_PATH);
-	char *wiki_var_path = (char*)malloc(vpath_len * sizeof(char));
+	int err;
 
 	// Copy the wiki root path string.
-	wiki_root = (char*)malloc(rpath_len * sizeof(char));
-	strncpy(wiki_root, wiki_path, rpath_len);
+	wiki_root = (char*)malloc((strlen(wiki_path) + 1) * sizeof(char));
+	strcpy(wiki_root, wiki_path);
 
-	// Build the wiki variables file path and check for its existance.
-	snprintf(wiki_var_path, vpath_len, "%s%s", wiki_path, UKI_VARIABLE_PATH);
-	if (!file_exists(wiki_var_path)) {
-		free(wiki_var_path);
-		return UKI_ERROR_NOVARIABLES;
-	}
+	if ((err = populate_variable_container(wiki_root, UKI_MANIFEST_PATH, &configs)) != UKI_OK)
+		return err;
+	if ((err = populate_variable_container(wiki_root, UKI_VARIABLE_PATH, &variables)) != UKI_OK)
+		return err;
 
-	// Initialize and populate variable container.
-	initialize_variables(&variables);
-	if (!populate_variables(&variables, wiki_var_path)) {
-		free(wiki_var_path);
-		return UKI_ERROR_PARSING_VARIABLES;
-	}
-
-	free(wiki_var_path);
 	return UKI_OK;
 }
 
@@ -80,6 +70,24 @@ int uki_render_page(char **rendered, const char *page) {
 	}
 
 	return UKI_OK;
+}
+
+/**
+ * Gets a uki configuration by its index.
+ *
+ * @param  index Configuration index.
+ * @param  var   The variable structure if it was found. NULL otherwise.
+ * @return       TRUE if the configuration was found.
+ */
+bool uki_config(const uint8_t index, uki_variable_t *var) {
+	// Check if the index is out of bounds.
+	if (index >= configs.size) {
+		var = NULL;
+		return false;
+	}
+
+	*var = configs.list[index];
+	return true;
 }
 
 /**
@@ -130,7 +138,40 @@ const char* uki_error_msg(const int ecode) {
  */
 void uki_clean() {
 	free(wiki_root);
+	free_variables(configs);
 	free_variables(variables);
+}
+
+/**
+ * Populates a variabl/configuration container.
+ *
+ * @param  wiki_root Path to the root of the uki wiki.
+ * @param  var_fname Path to the variabl/configuration file.
+ * @param  container Variable container.
+ * @return           UKI_OK if the operation was successful. Respective error
+ *                   code otherwise.
+ */
+int populate_variable_container(const char *wiki_root, const char *var_fname,
+								uki_variable_container *container) {
+	// Get path string length and allocate some memory.
+	size_t path_len = strlen(wiki_root) + 1 + strlen(var_fname);
+	char *var_path = (char*)malloc(path_len * sizeof(char));
+
+	// Build the wiki variables file path and check for its existance.
+	sprintf(var_path, "%s%s", wiki_root, var_fname);
+	if (!file_exists(var_path)) {
+		free(var_path);
+		return UKI_ERROR_NOVARIABLES;
+	}
+
+	// Initialize and populate variable container.
+	initialize_variables(container);
+	if (!populate_variables(container, var_path)) {
+		free(var_path);
+		return UKI_ERROR_PARSING_VARIABLES;
+	}
+
+	return UKI_OK;
 }
 
 /**
@@ -175,7 +216,7 @@ size_t slurp_file(char **contents, const char *fname) {
 	// Get file size and allocate memory for it.
 	fsize = file_contents_size(fname);
 	if (fsize >= 0L) {
-		*contents = (char*)malloc(1 + (fsize * sizeof(char)));
+		*contents = (char*)malloc((fsize + 1) * sizeof(char));
 	} else {
 		*contents = NULL;
 		return 0;
@@ -198,6 +239,8 @@ size_t slurp_file(char **contents, const char *fname) {
 	nread = fread(*contents, sizeof(char), fsize, fh);
 	fclose(fh);
 
+	// Make sure our string is properly terminated and return.
+	(*contents)[nread - 1] = '\0';
 	return nread;
 }
 
