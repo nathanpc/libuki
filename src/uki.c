@@ -14,6 +14,7 @@
 
 // Private variables.
 char *wiki_root;
+uki_variable_container variables;
 
 // Private methods.
 bool file_exists(const char *fpath);
@@ -28,23 +29,29 @@ size_t slurp_file(char **contents, const char *fname);
  */
 int uki_initialize(const char *wiki_path) {
 	// Get path string length and allocate some memory.
-	size_t path_len = strlen(wiki_path) + 1;
-	char *wiki_manifest = (char*)malloc((path_len + strlen(UKI_MANIFEST_PATH)) *
-										sizeof(char));
+	size_t rpath_len = strlen(wiki_path) + 1;
+	size_t vpath_len = rpath_len + strlen(UKI_VARIABLE_PATH);
+	char *wiki_var_path = (char*)malloc(vpath_len * sizeof(char));
 
-	// Copy the wiki root.
-	wiki_root = (char*)malloc(path_len * sizeof(char));
-	strncpy(wiki_root, wiki_path, path_len);
-	snprintf(wiki_manifest, path_len + strlen(UKI_MANIFEST_PATH),
-			 "%s%s", wiki_path, UKI_MANIFEST_PATH);
+	// Copy the wiki root path string.
+	wiki_root = (char*)malloc(rpath_len * sizeof(char));
+	strncpy(wiki_root, wiki_path, rpath_len);
 
-	// Check if a manifest exists.
-	if (!file_exists(wiki_manifest)) {
-		free(wiki_manifest);
-		return UKI_ERROR_NOMANIFEST;
+	// Build the wiki variables file path and check for its existance.
+	snprintf(wiki_var_path, vpath_len, "%s%s", wiki_path, UKI_VARIABLE_PATH);
+	if (!file_exists(wiki_var_path)) {
+		free(wiki_var_path);
+		return UKI_ERROR_NOVARIABLES;
 	}
 
-	free(wiki_manifest);
+	// Initialize and populate variable container.
+	initialize_variables(&variables);
+	if (!populate_variables(&variables, wiki_var_path)) {
+		free(wiki_var_path);
+		return UKI_ERROR_PARSING_VARIABLES;
+	}
+
+	free(wiki_var_path);
 	return UKI_OK;
 }
 
@@ -76,6 +83,24 @@ int uki_render_page(char **rendered, const char *page) {
 }
 
 /**
+ * Gets a uki variable by its index.
+ *
+ * @param  index Variable index.
+ * @param  var   The variable structure if it was found. NULL otherwise.
+ * @return       TRUE if the variable was found.
+ */
+bool uki_variable(const uint8_t index, uki_variable_t *var) {
+	// Check if the index is out of bounds.
+	if (index >= variables.size) {
+		var = NULL;
+		return false;
+	}
+
+	*var = variables.list[index];
+	return true;
+}
+
+/**
  * Gets a error message beased on a error code from uki.
  *
  * @param  ecode Error code.
@@ -84,11 +109,15 @@ int uki_render_page(char **rendered, const char *page) {
 const char* uki_error_msg(const int ecode) {
 	switch (ecode) {
 	case UKI_ERROR_NOMANIFEST:
-		return "No manifest found in the provided path.\n";
+		return "No manifest file found in the provided path.\n";
+	case UKI_ERROR_NOVARIABLES:
+		return "No variables file found in the provided path.\n";
 	case UKI_ERROR_NOARTICLE:
 		return "Article not found.\n";
 	case UKI_ERROR_PARSING_ARTICLE:
 		return "Error occured while parsing an article.\n";
+	case UKI_ERROR_PARSING_VARIABLES:
+		return "Error occured while parsing the variables file.\n";
 	case UKI_ERROR:
 		return "General error.\n";
 	}
@@ -101,6 +130,7 @@ const char* uki_error_msg(const int ecode) {
  */
 void uki_clean() {
 	free(wiki_root);
+	free_variables(variables);
 }
 
 /**

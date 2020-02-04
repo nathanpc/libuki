@@ -35,6 +35,16 @@ int main(const int argc, const char **argv) {
 		return 1;
 	}
 
+	// Print variables.
+	printf("Variables:\n");
+	uki_variable_t *var;
+	uint8_t iv = 0;
+	while (uki_variable(iv, var)) {
+		printf("   %s <- %s\n", var->key, var->value);
+		iv++;
+	}
+	printf("\n");
+
 	// Render a page.
 	char *content;
 	if ((uki_error = uki_render_page(&content, argv[2])) != UKI_OK) {
@@ -45,6 +55,7 @@ int main(const int argc, const char **argv) {
 	}
 
 	// Print the page content.
+	printf("Content:\n");
 	printf("%s\n", content);
 
 	// Clean up and return.

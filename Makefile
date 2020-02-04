@@ -14,7 +14,7 @@ TESTWIKI = test/
 TESTARTICLE = something
 TESTRUN = ./$(TARGET) $(TESTWIKI) $(TESTARTICLE)
 
-SOURCES += $(SRCDIR)/main.c $(SRCDIR)/uki.c
+SOURCES += $(SRCDIR)/main.c $(SRCDIR)/uki.c $(SRCDIR)/config.c
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/obj/%,$(SOURCES:.c=.o))
 CFLAGS = -Wall -I $(INCDIR)
 
