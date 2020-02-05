@@ -32,5 +32,9 @@ typedef struct {
 void initialize_variables(uki_variable_container *container);
 bool populate_variables(uki_variable_container *container, const char *fname);
 void free_variables(uki_variable_container container);
+bool find_variable_i(const uint8_t index, const uki_variable_container container,
+					 uki_variable_t *var);
+bool find_variable(const char *key, const uki_variable_container container,
+				   uki_variable_t *var);
 
 #endif /* _CONFIG_H_ */

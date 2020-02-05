@@ -86,6 +86,47 @@ void free_variables(uki_variable_container container) {
 }
 
 /**
+ * Gets a variable by its index.
+ *
+ * @param  index     Variable index.
+ * @param  container Variable container to search into.
+ * @param  var       The variable structure if it was found. NULL otherwise.
+ * @return           TRUE if the variable was found.
+ */
+bool find_variable_i(const uint8_t index, const uki_variable_container container,
+					 uki_variable_t *var) {
+	// Check if the index is out of bounds.
+	if (index >= container.size) {
+		var = NULL;
+		return false;
+	}
+
+	*var = container.list[index];
+	return true;
+}
+
+/**
+ * Gets a variable by its key.
+ *
+ * @param  key       Variable key.
+ * @param  container Variable container to search into.
+ * @param  var       The variable structure if it was found. NULL otherwise.
+ * @return           TRUE if the variable was found.
+ */
+bool find_variable(const char *key, const uki_variable_container container,
+				   uki_variable_t *var) {
+	for (uint8_t i = 0; i < container.size; i++) {
+		if (strcmp(key, container.list[i].key) == 0) {
+			*var = container.list[i];
+			return true;
+		}
+	}
+
+	var = NULL;
+	return false;
+}
+
+/**
  * Parses a line and extracts a key and value for a variable.
  *
  * @param  line Line string to be parsed.

@@ -36,7 +36,7 @@ int uki_initialize(const char *wiki_path) {
 	strcpy(wiki_root, wiki_path);
 
 	// Initialize templating engine.
-	initialize_templating(wiki_root);
+	initialize_templating(wiki_root, &variables);
 
 	if ((err = populate_variable_container(wiki_root, UKI_MANIFEST_PATH, &configs)) != UKI_OK)
 		return err;
@@ -81,14 +81,7 @@ int uki_render_page(char **rendered, const char *page) {
  * @return       TRUE if the configuration was found.
  */
 bool uki_config(const uint8_t index, uki_variable_t *var) {
-	// Check if the index is out of bounds.
-	if (index >= configs.size) {
-		var = NULL;
-		return false;
-	}
-
-	*var = configs.list[index];
-	return true;
+	return find_variable_i(index, configs, var);
 }
 
 /**
@@ -99,14 +92,7 @@ bool uki_config(const uint8_t index, uki_variable_t *var) {
  * @return       TRUE if the variable was found.
  */
 bool uki_variable(const uint8_t index, uki_variable_t *var) {
-	// Check if the index is out of bounds.
-	if (index >= variables.size) {
-		var = NULL;
-		return false;
-	}
-
-	*var = variables.list[index];
-	return true;
+	return find_variable_i(index, variables, var);
 }
 
 /**
