@@ -9,6 +9,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#define VAR_LINE_MATCH "%49[^=]=%99[0-9a-zA-Z '\".,;:!@#$%%^&*()_-+=][^\r\n]"
+
 // Private methods.
 bool parse_variable_line(const char *line, uki_variable_t *var);
 
@@ -95,9 +97,7 @@ bool parse_variable_line(const char *line, uki_variable_t *var) {
 	char value[VARIABLE_VALUE_MAX_CHAR];
 
 	// Parse key and value.
-	int nmatch = sscanf(line,
-						"%49[^=]=%99[0-9a-zA-Z '\".,;:!@#$%%^&*()_-+=]%[^\r\n]",
-						key, value);
+	int nmatch = sscanf(line, VAR_LINE_MATCH, key, value);
 	if (nmatch != 2) {
 		return false;
 	}

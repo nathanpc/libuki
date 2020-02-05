@@ -21,7 +21,6 @@ uki_variable_container variables;
 // Private methods.
 int populate_variable_container(const char *wiki_root, const char *var_fname,
 								uki_variable_container *container);
-int render_page_template(char **rendered, const char *template_name);
 
 /**
  * Initializes the wiki.
@@ -35,6 +34,9 @@ int uki_initialize(const char *wiki_path) {
 	// Copy the wiki root path string.
 	wiki_root = (char*)malloc((strlen(wiki_path) + 1) * sizeof(char));
 	strcpy(wiki_root, wiki_path);
+
+	// Initialize templating engine.
+	initialize_templating(wiki_root);
 
 	if ((err = populate_variable_container(wiki_root, UKI_MANIFEST_PATH, &configs)) != UKI_OK)
 		return err;
@@ -68,11 +70,7 @@ int uki_render_page(char **rendered, const char *page) {
 
 	// Render template for placing article into.
 	char *template;
-	//while (render_page_template(&template, "container"));
-	render_page_template(&template, "container");
-	printf("%s\n", template);
-
-	return UKI_OK;
+	return render_template(&template, "container");
 }
 
 /**
@@ -132,7 +130,9 @@ const char* uki_error_msg(const int ecode) {
 	case UKI_ERROR_PARSING_VARIABLES:
 		return "Error occured while parsing the variables file.\n";
 	case UKI_ERROR_PARSING_TEMPLATE:
-		return "Error occured while parsing/rendering a template file.\n";
+		return "Error occured while parsing a template file.\n";
+	case UKI_ERROR_READING_TEMPLATE:
+		return "Error occured while reading a template file.\n";
 	case UKI_ERROR:
 		return "General error.\n";
 	}
@@ -147,34 +147,6 @@ void uki_clean() {
 	free(wiki_root);
 	free_variables(configs);
 	free_variables(variables);
-}
-
-/**
- * Renders a page template and returns it.
- *
- * @param  rendered      The final rendered page. Allocated by this function.
- * @param  template_name The template file to be rendered.
- * @return               UKI_OK if the rendering went smoothly.
- */
-int render_page_template(char **rendered, const char *template_name) {
-	// Build template path.
-	char template_path[UKI_MAX_PATH];
-	snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
-			 UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
-
-	// Check if there is a template there.
-	if (!file_exists(template_path))
-		return UKI_ERROR_NOTEMPLATE;
-
-	// Slurp file.
-	slurp_file(rendered, template_path);
-	if (*rendered == NULL)
-		return UKI_ERROR_PARSING_TEMPLATE;
-
-	// Render the template.
-	substitute_templates(rendered);
-
-	return UKI_OK;
 }
 
 /**

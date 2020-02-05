@@ -8,29 +8,8 @@
 #ifndef _UKI_H_
 #define _UKI_H_
 
+#include "constants.h"
 #include "config.h"
-
-// Return codes.
-#define UKI_OK    1
-#define UKI_ERROR 0
-#define UKI_ERROR_NOMANIFEST  -11
-#define UKI_ERROR_NOVARIABLES -12
-#define UKI_ERROR_NOARTICLE   -13
-#define UKI_ERROR_NOTEMPLATE  -14
-#define UKI_ERROR_PARSING_ARTICLE   -21
-#define UKI_ERROR_PARSING_VARIABLES -22
-#define UKI_ERROR_PARSING_TEMPLATE  -23
-
-// Paths.
-#define UKI_MANIFEST_PATH "/MANIFEST.uki"
-#define UKI_VARIABLE_PATH "/VARIABLES.uki"
-#define UKI_ARTICLE_ROOT  "/pages/"
-#define UKI_TEMPLATE_ROOT "/templates/"
-#define UKI_ARTICLE_EXT   "html"
-#define UKI_TEMPLATE_EXT  "html"
-
-// Misc.
-#define UKI_MAX_PATH 512
 
 const char* uki_error_msg(const int ecode);
 void uki_clean();

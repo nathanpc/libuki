@@ -10,8 +10,8 @@
 
 #include <stdbool.h>
 
-#define UKI_MAX_TEMPLATE_NAME 50
-
-bool substitute_templates(char **template);
+void initialize_templating(const char *_wiki_root);
+int substitute_templates(char **template);
+int render_template(char **rendered, const char *template_name);
 
 #endif /* _TEMPLATE_H_ */
