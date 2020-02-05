@@ -6,11 +6,12 @@
  */
 
 #include "uki.h"
+#include "fileutils.h"
+#include "template.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include <unistd.h>
 
 // Private variables.
 char *wiki_root;
@@ -18,11 +19,9 @@ uki_variable_container configs;
 uki_variable_container variables;
 
 // Private methods.
-bool file_exists(const char *fpath);
-long file_contents_size(const char *fname);
-size_t slurp_file(char **contents, const char *fname);
 int populate_variable_container(const char *wiki_root, const char *var_fname,
 								uki_variable_container *container);
+int render_page_template(char **rendered, const char *template_name);
 
 /**
  * Initializes the wiki.
@@ -59,15 +58,19 @@ int uki_render_page(char **rendered, const char *page) {
 			 UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
 
 	// Check if there is an article there.
-	if (!file_exists(article_path)) {
+	if (!file_exists(article_path))
 		return UKI_ERROR_NOARTICLE;
-	}
 
 	// Slurp file.
 	slurp_file(rendered, article_path);
-	if (*rendered == NULL) {
+	if (*rendered == NULL)
 		return UKI_ERROR_PARSING_ARTICLE;
-	}
+
+	// Render template for placing article into.
+	char *template;
+	//while (render_page_template(&template, "container"));
+	render_page_template(&template, "container");
+	printf("%s\n", template);
 
 	return UKI_OK;
 }
@@ -122,10 +125,14 @@ const char* uki_error_msg(const int ecode) {
 		return "No variables file found in the provided path.\n";
 	case UKI_ERROR_NOARTICLE:
 		return "Article not found.\n";
+	case UKI_ERROR_NOTEMPLATE:
+		return "Template file not found.\n";
 	case UKI_ERROR_PARSING_ARTICLE:
 		return "Error occured while parsing an article.\n";
 	case UKI_ERROR_PARSING_VARIABLES:
 		return "Error occured while parsing the variables file.\n";
+	case UKI_ERROR_PARSING_TEMPLATE:
+		return "Error occured while parsing/rendering a template file.\n";
 	case UKI_ERROR:
 		return "General error.\n";
 	}
@@ -143,7 +150,35 @@ void uki_clean() {
 }
 
 /**
- * Populates a variabl/configuration container.
+ * Renders a page template and returns it.
+ *
+ * @param  rendered      The final rendered page. Allocated by this function.
+ * @param  template_name The template file to be rendered.
+ * @return               UKI_OK if the rendering went smoothly.
+ */
+int render_page_template(char **rendered, const char *template_name) {
+	// Build template path.
+	char template_path[UKI_MAX_PATH];
+	snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
+			 UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
+
+	// Check if there is a template there.
+	if (!file_exists(template_path))
+		return UKI_ERROR_NOTEMPLATE;
+
+	// Slurp file.
+	slurp_file(rendered, template_path);
+	if (*rendered == NULL)
+		return UKI_ERROR_PARSING_TEMPLATE;
+
+	// Render the template.
+	substitute_templates(rendered);
+
+	return UKI_OK;
+}
+
+/**
+ * Populates a variable/configuration container.
  *
  * @param  wiki_root Path to the root of the uki wiki.
  * @param  var_fname Path to the variabl/configuration file.
@@ -172,84 +207,4 @@ int populate_variable_container(const char *wiki_root, const char *var_fname,
 	}
 
 	return UKI_OK;
-}
-
-/**
- * Gets the size of a buffer to hold the whole contents of a file.
- *
- * @param  fname File path.
- * @return       Size of the content of specified file. -1 if an error occured.
- */
-long file_contents_size(const char *fname) {
-	FILE *fh;
-	long numbytes;
-
-	// Open file.
-	fh = fopen(fname, "r");
-	if (fh == NULL) {
-		return -1L;
-	}
-
-	// Seek file to determine its size.
-	fseek(fh, 0L, SEEK_END);
-	numbytes = ftell(fh);
-
-	// Close the file handler and return.
-	fclose(fh);
-	return numbytes;
-}
-
-/**
- * Reads a whole file and stores it into a string.
- *
- * @param  contents String where the file contents are to be stored (will be
- *                  allocated by this function).
- * @param  fname    File path.
- * @return          Size of the contents string. Sets contents to NULL in case
- *                  of error.
- */
-size_t slurp_file(char **contents, const char *fname) {
-	FILE *fh;
-	long fsize;
-	size_t nread;
-
-	// Get file size and allocate memory for it.
-	fsize = file_contents_size(fname);
-	if (fsize >= 0L) {
-		*contents = (char*)malloc((fsize + 1) * sizeof(char));
-	} else {
-		*contents = NULL;
-		return 0;
-	}
-
-	// Handle empty files.
-	if (fsize == 0L) {
-		*contents[0] = '\0';
-		return 0;
-	}
-
-	// Open file to read its contents.
-	fh = fopen(fname, "r");
-	if (fh == NULL) {
-		*contents = NULL;
-		return 0;
-	}
-
-	// Reads the whole file into the buffer and close it.
-	nread = fread(*contents, sizeof(char), fsize, fh);
-	fclose(fh);
-
-	// Make sure our string is properly terminated and return.
-	(*contents)[nread - 1] = '\0';
-	return nread;
-}
-
-/**
- * Checks if a file exists.
- *
- * @param  fpath File path to be checked.
- * @return       TRUE if the file exists.
- */
-bool file_exists(const char *fpath) {
-	return access(fpath, F_OK) != -1;
 }

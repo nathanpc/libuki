@@ -96,7 +96,7 @@ bool parse_variable_line(const char *line, uki_variable_t *var) {
 
 	// Parse key and value.
 	int nmatch = sscanf(line,
-						"%49[^=]=%99[0-9a-zA-Z '\".,;:!@#$%%^&*()_-+=][^\r\n]",
+						"%49[^=]=%99[0-9a-zA-Z '\".,;:!@#$%%^&*()_-+=]%[^\r\n]",
 						key, value);
 	if (nmatch != 2) {
 		return false;
