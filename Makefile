@@ -32,6 +32,11 @@ $(BUILDDIR)/obj/%.o: $(SRCDIR)/%.c
 run: $(TARGET)
 	$(TESTRUN)
 
+test: $(TARGET)
+	#$(TESTRUN) | w3m -T text/html
+	$(TESTRUN) > $(TESTWIKI)/test.html
+	dillo $(TESTWIKI)/test.html
+
 debug: CFLAGS += -g3 -DDEBUG
 debug: clean $(TARGET)
 	$(GDB) $(TARGET)

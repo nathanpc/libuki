@@ -37,6 +37,7 @@ int main(const int argc, const char **argv) {
 		return 1;
 	}
 
+#ifdef DEBUG
 	// Print configurations.
 	uki_variable_t *var;
 	uint8_t iv = 0;
@@ -55,6 +56,7 @@ int main(const int argc, const char **argv) {
 		iv++;
 	}
 	printf("\n");
+#endif
 
 	// Render a page.
 	char *content;
@@ -66,7 +68,6 @@ int main(const int argc, const char **argv) {
 	}
 
 	// Print the page content.
-	printf("Content:\n");
 	printf("%s\n", content);
 
 	// Clean up and return.
