@@ -18,7 +18,7 @@ SOURCES += $(SRCDIR)/main.c $(SRCDIR)/uki.c $(SRCDIR)/config.c $(SRCDIR)/templat
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/obj/%,$(SOURCES:.c=.o))
 CFLAGS = -Wall -I $(INCDIR)
 
-
+.PHONY: all run test debug memcheck clean
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
