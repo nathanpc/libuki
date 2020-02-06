@@ -70,9 +70,14 @@ int uki_render_page(char **rendered, const char *page) {
 	if (article == NULL)
 		return UKI_ERROR_PARSING_ARTICLE;
 
+	// Get main template.
+	int idx = find_variable(UKI_VAR_MAIN_TEMPLATE, configs);
+	if (idx < 0)
+		return UKI_ERROR_NOMAINTEMPLATE;
+
 	// Render template for placing article into.
 	int err;
-	if ((err = render_template(rendered, "container")) != UKI_OK)
+	if ((err = render_template(rendered, configs.list[idx].value)) != UKI_OK)
 		return err;
 
 	return render_variables(rendered, variables);
@@ -116,6 +121,8 @@ const char* uki_error_msg(const int ecode) {
 		return "Article not found.\n";
 	case UKI_ERROR_NOTEMPLATE:
 		return "Template file not found.\n";
+	case UKI_ERROR_NOMAINTEMPLATE:
+		return "No 'main_template' variable set in the manifest.\n";
 	case UKI_ERROR_VARIABLE_NOTFOUND:
 		return "Variable not found.\n";
 	case UKI_ERROR_PARSING_ARTICLE:

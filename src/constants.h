@@ -11,11 +11,12 @@
 // Return codes.
 #define UKI_OK    1
 #define UKI_ERROR 0
-#define UKI_ERROR_NOMANIFEST  -11
-#define UKI_ERROR_NOVARIABLES -12
-#define UKI_ERROR_NOARTICLE   -13
-#define UKI_ERROR_NOTEMPLATE  -14
-#define UKI_ERROR_VARIABLE_NOTFOUND -15
+#define UKI_ERROR_NOMANIFEST     -11
+#define UKI_ERROR_NOVARIABLES    -12
+#define UKI_ERROR_NOARTICLE      -13
+#define UKI_ERROR_NOTEMPLATE     -14
+#define UKI_ERROR_NOMAINTEMPLATE -15
+#define UKI_ERROR_VARIABLE_NOTFOUND -16
 #define UKI_ERROR_PARSING_ARTICLE   -21
 #define UKI_ERROR_PARSING_VARIABLES -22
 #define UKI_ERROR_PARSING_TEMPLATE  -23
@@ -28,6 +29,9 @@
 #define UKI_TEMPLATE_ROOT "/templates/"
 #define UKI_ARTICLE_EXT   "html"
 #define UKI_TEMPLATE_EXT  "html"
+
+// Variable keys.
+#define UKI_VAR_MAIN_TEMPLATE "main_template"
 
 // Misc.
 #define UKI_MAX_PATH 512
