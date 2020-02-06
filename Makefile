@@ -5,6 +5,8 @@ CC = gcc
 RM = rm -f
 GDB = gdb
 MKDIR = mkdir -p
+W3M = w3m -T text/html
+DILLO = dillo
 
 SRCDIR = src
 INCDIR = include
@@ -33,9 +35,9 @@ run: $(TARGET)
 	$(TESTRUN)
 
 test: $(TARGET)
-	#$(TESTRUN) | w3m -T text/html
+	@#$(TESTRUN) | $(W3M)
 	$(TESTRUN) > $(TESTWIKI)/test.html
-	dillo $(TESTWIKI)/test.html
+	$(DILLO) $(TESTWIKI)/test.html
 
 debug: CFLAGS += -g3 -DDEBUG
 debug: clean $(TARGET)
