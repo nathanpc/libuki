@@ -21,6 +21,7 @@
 // sscanf matching.
 #define TEMPLATE_FILE_MATCH "%*[^[][%49[^]]]%*[^]]"
 #define TEMPLATE_VAR_MATCH  "%*[^%]%%%49[^%]%%%*[^%]"
+#define TEMPLATE_BODY_MATCH "%_body_%"
 
 // Global variables.
 const char *wiki_root_path;
@@ -146,6 +147,35 @@ int render_variables(char **filled_template,
 
 	// Looks like we finally don't have any tags left.
 	return UKI_ERROR_PARSING_TEMPLATE;
+}
+
+/**
+ * Substitutes article page found inside a template.
+ *
+ * @param  filled_template Template contents already all populated.
+ * @param  path            Article page absolute path.
+ * @return                 UKI_OK when the substitution was successful.
+ */
+int render_article(char **filled_template, const char *path) {
+	// Check if there is an article there.
+	if (!file_exists(path))
+		return UKI_ERROR_NOARTICLE;
+
+	// Check if there is a body variable available in the template.
+	if (strstr(*filled_template, TEMPLATE_BODY_MATCH) == NULL) {
+		return UKI_ERROR_BODYVAR_NOTFOUND;
+	}
+
+	// Slurp file.
+	char *article;
+	slurp_file(&article, path);
+	if (article == NULL)
+		return UKI_ERROR_PARSING_ARTICLE;
+
+	// Replace the body variable and return.
+	replace_string(filled_template, TEMPLATE_BODY_MATCH, article,
+				   SUBSTITUTE_STRING);
+	return UKI_OK;
 }
 
 /**

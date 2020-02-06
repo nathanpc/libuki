@@ -55,20 +55,8 @@ int uki_initialize(const char *wiki_path) {
  * @return          UKI_OK if there were no errors.
  */
 int uki_render_page(char **rendered, const char *page) {
-	// Build article path.
 	char article_path[UKI_MAX_PATH];
-	snprintf(article_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
-			 UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
-
-	// Check if there is an article there.
-	if (!file_exists(article_path))
-		return UKI_ERROR_NOARTICLE;
-
-	// Slurp file.
-	char *article;
-	slurp_file(&article, article_path);
-	if (article == NULL)
-		return UKI_ERROR_PARSING_ARTICLE;
+	int err;
 
 	// Get main template.
 	int idx = find_variable(UKI_VAR_MAIN_TEMPLATE, configs);
@@ -76,8 +64,13 @@ int uki_render_page(char **rendered, const char *page) {
 		return UKI_ERROR_NOMAINTEMPLATE;
 
 	// Render template for placing article into.
-	int err;
 	if ((err = render_template(rendered, configs.list[idx].value)) != UKI_OK)
+		return err;
+
+	// Build article path and render it.
+	snprintf(article_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
+			 UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
+	if ((err = render_article(rendered, article_path)) != UKI_OK)
 		return err;
 
 	return render_variables(rendered, variables);
@@ -125,6 +118,8 @@ const char* uki_error_msg(const int ecode) {
 		return "No 'main_template' variable set in the manifest.\n";
 	case UKI_ERROR_VARIABLE_NOTFOUND:
 		return "Variable not found.\n";
+	case UKI_ERROR_BODYVAR_NOTFOUND:
+		return "Body variable not found in the main template.\n";
 	case UKI_ERROR_PARSING_ARTICLE:
 		return "Error occured while parsing an article.\n";
 	case UKI_ERROR_PARSING_VARIABLES:
