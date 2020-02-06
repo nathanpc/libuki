@@ -51,7 +51,7 @@ int main(const int argc, const char **argv) {
 Let's assume that you have a project folder with the following structure.
 
 ```
-.
+~/testuki
 ├── libuki
 │   └── (this repository)
 ├── testwiki
@@ -67,11 +67,11 @@ Let's assume that you have a project folder with the following structure.
 To compile and run this project just follow these simple steps:
 
 ```console
-foo@bar:~/testuki$ cd libuki
-foo@bar:~/testuki/libuki$ make
-foo@bar:~/testuki/libuki$ cd ..
-foo@bar:~/testuki$ gcc -Llibuki/build/lib -o testuki test.c -luki
-foo@bar:~/testuki$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH ./testuki
+~/testuki$ cd libuki
+~/testuki/libuki$ make
+~/testuki/libuki$ cd ..
+~/testuki$ gcc -Llibuki/build/lib -o testuki test.c -luki
+~/testuki$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH ./testuki
 ```
 
 
