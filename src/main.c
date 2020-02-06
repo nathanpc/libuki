@@ -21,13 +21,15 @@ void usage();
  * @return      Return code.
  */
 int main(const int argc, const char **argv) {
+	int uki_error;
+
+	// Check command-line arguments.
 	if (argc == 2) {
 		usage();
 		return 1;
 	}
 
 	// Initialize the uki wiki.
-	int uki_error;
 	if ((uki_error = uki_initialize(argv[1])) != UKI_OK) {
 		fprintf(stderr, uki_error_msg(uki_error));
 		uki_clean();
