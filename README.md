@@ -12,7 +12,7 @@ example by looking at the [`src/main.c`](/src/main.c) file. Anyway, this is
 a simple way to render a page given a `wiki_path` (the root of the μki) and
 a `page_name`:
 
-```
+```c
 #include <stdio.h>
 #include <stdlib.h>
 #include "uki.h"
@@ -66,12 +66,12 @@ Let's assume that you have a project folder with the following structure.
 
 To compile and run this project just follow these simple steps:
 
-```
-$ cd libuki
-$ make
-$ cd ..
-$ gcc -Llibuki/build/lib -o testuki test.c -luki
-$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH ./testuki
+```console
+foo@bar:~/testuki$ cd libuki
+foo@bar:~/testuki/libuki$ make
+foo@bar:~/testuki/libuki$ cd ..
+foo@bar:~/testuki$ gcc -Llibuki/build/lib -o testuki test.c -luki
+foo@bar:~/testuki$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH ./testuki
 ```
 
 
