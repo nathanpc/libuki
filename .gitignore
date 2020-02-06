@@ -3,7 +3,8 @@ test/
 
 # Objects and other compilation artifacts.
 *.o
-uki
+*.so
+build/
 
 # Debugging artifacts.
 valgrind*
