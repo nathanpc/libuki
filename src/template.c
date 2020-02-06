@@ -20,9 +20,10 @@
 
 // sscanf matching.
 #define TEMPLATE_FILE_MATCH "%*[^[][%49[^]]]%*[^]]"
+#define TEMPLATE_VAR_MATCH  "%*[^%]%%%49[^%]%%%*[^%]"
 
 // Global variables.
-const char *wiki_root;
+const char *wiki_root_path;
 
 // Position structure.
 typedef struct {
@@ -34,14 +35,15 @@ typedef struct {
 spos_t substpos(const char *haystack, const char *needle, const uint8_t type);
 void replace_string(char **haystack, const char *needle, const char *substr,
 					const uint8_t type);
+int substitute_templates(char **template);
 
 /**
  * Initializes the templating engine.
  *
- * @param _wiki_root     Path to the root of the uki wiki.
+ * @param _wiki_root Path to the root of the uki wiki.
  */
 void initialize_templating(const char *_wiki_root) {
-	wiki_root = _wiki_root;
+	wiki_root_path = _wiki_root;
 }
 
 /**
@@ -54,9 +56,11 @@ int substitute_templates(char **template) {
 	char fname[UKI_MAX_TEMPLATE_NAME];
 	char *ntemp;
 	int err;
+	int nmatches;
 
 	// Try to find a template tag.
-	if (sscanf(*template, TEMPLATE_FILE_MATCH, fname) == 1) {
+	nmatches = sscanf(*template, TEMPLATE_FILE_MATCH, fname);
+	if (nmatches == 1) {
 		// Get template file contents.
 		if ((err = render_template(&ntemp, fname)) != UKI_OK) {
 			return err;
@@ -69,7 +73,7 @@ int substitute_templates(char **template) {
 		// Continue until we don't have any one left.
 		if (substitute_templates(template) == UKI_OK)
 			return UKI_OK;
-	} else if (sscanf(*template, TEMPLATE_FILE_MATCH, fname) == EOF) {
+	} else if (nmatches == EOF) {
 		// Finished substituting the templates.
 		return UKI_OK;
 	}
@@ -88,7 +92,7 @@ int substitute_templates(char **template) {
 int render_template(char **rendered, const char *template_name) {
 	// Build template path.
 	char template_path[UKI_MAX_PATH];
-	snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
+	snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root_path,
 			 UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
 
 	// Check if there is a template there.
@@ -102,6 +106,46 @@ int render_template(char **rendered, const char *template_name) {
 
 	// Render the template and return.
 	return substitute_templates(rendered);
+}
+
+/**
+ * Substitutes variable references found inside a template.
+ *
+ * @param  filled_template Template contents already all populated.
+ * @param  variables       Variables container.
+ * @return                 UKI_OK when all the substitutions were successful.
+ */
+int render_variables(char **filled_template,
+					const uki_variable_container variables) {
+	char vname[VARIABLE_KEY_MAX_CHAR];
+	int ivar;
+	int nmatches;
+	int err;
+
+	// Try to find a variable tag.
+	nmatches = sscanf(*filled_template, TEMPLATE_VAR_MATCH, vname);
+	if (nmatches == 1) {
+		// Get variable contents.
+		if ((ivar = find_variable(vname, variables)) < 0) {
+			//fprintf(stderr, "WARNING: Couldn't find variable '%s'.\n", vname);
+			return UKI_ERROR_VARIABLE_NOTFOUND;
+		}
+
+		// If found, replace it.
+		replace_string(filled_template, vname,
+					   variables.list[ivar].value, SUBSTITUTE_VARIABLE);
+
+		// Continue until we don't have any one left.
+		err = render_variables(filled_template, variables);
+		if ((err == UKI_OK) || (err ==  UKI_ERROR_VARIABLE_NOTFOUND))
+			return err;
+	} else if (nmatches == EOF) {
+		// Finished substituting the templates.
+		return UKI_OK;
+	}
+
+	// Looks like we finally don't have any tags left.
+	return UKI_ERROR_PARSING_TEMPLATE;
 }
 
 /**

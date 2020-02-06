@@ -9,9 +9,11 @@
 #define _TEMPLATE_H_
 
 #include <stdbool.h>
+#include "config.h"
 
 void initialize_templating(const char *_wiki_root);
-int substitute_templates(char **template);
 int render_template(char **rendered, const char *template_name);
+int render_variables(char **filled_template,
+					const uki_variable_container variables);
 
 #endif /* _TEMPLATE_H_ */

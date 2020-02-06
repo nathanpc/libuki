@@ -35,13 +35,14 @@ int uki_initialize(const char *wiki_path) {
 	wiki_root = (char*)malloc((strlen(wiki_path) + 1) * sizeof(char));
 	strcpy(wiki_root, wiki_path);
 
-	// Initialize templating engine.
-	initialize_templating(wiki_root, &variables);
-
+	// Populate the variable containers.
 	if ((err = populate_variable_container(wiki_root, UKI_MANIFEST_PATH, &configs)) != UKI_OK)
 		return err;
 	if ((err = populate_variable_container(wiki_root, UKI_VARIABLE_PATH, &variables)) != UKI_OK)
 		return err;
+
+	// Initialize templating engine.
+	initialize_templating(wiki_root);
 
 	return UKI_OK;
 }
@@ -64,13 +65,17 @@ int uki_render_page(char **rendered, const char *page) {
 		return UKI_ERROR_NOARTICLE;
 
 	// Slurp file.
-	slurp_file(rendered, article_path);
-	if (*rendered == NULL)
+	char *article;
+	slurp_file(&article, article_path);
+	if (article == NULL)
 		return UKI_ERROR_PARSING_ARTICLE;
 
 	// Render template for placing article into.
-	char *template;
-	return render_template(&template, "container");
+	int err;
+	if ((err = render_template(rendered, "container")) != UKI_OK)
+		return err;
+
+	return render_variables(rendered, variables);
 }
 
 /**
@@ -111,6 +116,8 @@ const char* uki_error_msg(const int ecode) {
 		return "Article not found.\n";
 	case UKI_ERROR_NOTEMPLATE:
 		return "Template file not found.\n";
+	case UKI_ERROR_VARIABLE_NOTFOUND:
+		return "Variable not found.\n";
 	case UKI_ERROR_PARSING_ARTICLE:
 		return "Error occured while parsing an article.\n";
 	case UKI_ERROR_PARSING_VARIABLES:

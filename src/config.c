@@ -1,5 +1,5 @@
 /**
- * config.h
+ * config.c
  * Helps parse the configuration files.
  *
  * @author: Nathan Campos <hi@nathancampos.me>
@@ -106,24 +106,21 @@ bool find_variable_i(const uint8_t index, const uki_variable_container container
 }
 
 /**
- * Gets a variable by its key.
+ * Gets a variable index by its key.
  *
  * @param  key       Variable key.
  * @param  container Variable container to search into.
- * @param  var       The variable structure if it was found. NULL otherwise.
- * @return           TRUE if the variable was found.
+ * @return           Variable index in case it was found. A negative number
+ *                   otherwise.
  */
-bool find_variable(const char *key, const uki_variable_container container,
-				   uki_variable_t *var) {
+int find_variable(const char *key, const uki_variable_container container) {
 	for (uint8_t i = 0; i < container.size; i++) {
 		if (strcmp(key, container.list[i].key) == 0) {
-			*var = container.list[i];
-			return true;
+			return i;
 		}
 	}
 
-	var = NULL;
-	return false;
+	return -1;
 }
 
 /**
