@@ -59,7 +59,7 @@ int main(const int argc, const char **argv) {
 	// Render a page.
 	char *content;
 	if ((uki_error = uki_render_page(&content, argv[2])) != UKI_OK) {
-		fprintf(stderr, uki_error_msg(uki_error));
+		fprintf(stderr, "ERROR: %s", uki_error_msg(uki_error));
 		uki_clean();
 
 		return 1;
