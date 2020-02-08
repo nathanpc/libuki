@@ -75,7 +75,7 @@ foo@bar:~/testuki$ gcc -Llibuki/build/lib -o testuki test.c -luki
 foo@bar:~/testuki$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH ./testuki
 ```
 
-If you're running Windows it's just a matter of opening the Visual Studio
+If you're running **Windows** it's just a matter of opening the Visual Studio
 Workspace `*.dsw` file and hitting `Build`. This will build you a DLL that
 you can use in your programs.
 
