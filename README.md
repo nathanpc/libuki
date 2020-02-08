@@ -64,7 +64,8 @@ Let's assume that you have a project folder with the following structure.
 └── test.c
 ```
 
-To compile and run this project just follow these simple steps:
+To compile and run this project just follow these simple steps for **UNIX**
+systems:
 
 ```console
 foo@bar:~/testuki$ cd libuki
@@ -73,6 +74,10 @@ foo@bar:~/testuki/libuki$ cd ..
 foo@bar:~/testuki$ gcc -Llibuki/build/lib -o testuki test.c -luki
 foo@bar:~/testuki$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH ./testuki
 ```
+
+If you're running Windows it's just a matter of opening the Visual Studio
+Workspace `*.dsw` file and hitting `Build`. This will build you a DLL that
+you can use in your programs.
 
 
 ## License
