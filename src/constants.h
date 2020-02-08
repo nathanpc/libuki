@@ -8,9 +8,7 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-#ifdef WINDOWS
-#include <windows.h>
-#endif
+#include "windowshelper.h"
 
 // Return codes.
 #define UKI_OK    1
@@ -28,10 +26,17 @@
 #define UKI_ERROR_READING_TEMPLATE  -24
 
 // Paths.
+#ifdef WINDOWS
+#define UKI_MANIFEST_PATH "\\MANIFEST.uki"
+#define UKI_VARIABLE_PATH "\\VARIABLES.uki"
+#define UKI_ARTICLE_ROOT  "\\pages\\"
+#define UKI_TEMPLATE_ROOT "\\templates\\"
+#else
 #define UKI_MANIFEST_PATH "/MANIFEST.uki"
 #define UKI_VARIABLE_PATH "/VARIABLES.uki"
 #define UKI_ARTICLE_ROOT  "/pages/"
 #define UKI_TEMPLATE_ROOT "/templates/"
+#endif
 #define UKI_ARTICLE_EXT   "html"
 #define UKI_TEMPLATE_EXT  "html"
 

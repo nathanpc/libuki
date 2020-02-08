@@ -79,6 +79,10 @@ If you're running **Windows** it's just a matter of opening the Visual Studio
 Workspace `*.dsw` file and hitting `Build`. This will build you a DLL that
 you can use in your programs.
 
+If you're targetting the **Windows CE** platform just open the `*.vcw` file,
+which will open eMbedded Visual C++ and hit `Build`. This will build and deploy
+the DLL to your target device.
+
 
 ## License
 

@@ -6,12 +6,19 @@ test/
 *.so
 build/
 Debug/
+*Dbg/
+*Rel/
 
 # Visual Studio.
 *.plg
 *.opt
 *.vbw
 *.ncb
+
+# eMbedded Visual Studio.
+*.vco
+*.vcb
+*.vcl
 
 # Debugging artifacts.
 valgrind*

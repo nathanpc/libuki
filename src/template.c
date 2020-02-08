@@ -100,7 +100,8 @@ int render_template(char **rendered, const char *template_name) {
 	// Build template path.
 	char template_path[UKI_MAX_PATH];
 #ifdef WINDOWS
-	sprintf(template_path, "%s%s%s.%s", wiki_root_path, UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
+	_snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root_path,
+			  UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
 #else
 	snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root_path,
 			 UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);

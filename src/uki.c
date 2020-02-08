@@ -94,7 +94,8 @@ int uki_render_page(char **rendered, const char *page) {
 
 	// Build article path and render it.
 #ifdef WINDOWS
-	sprintf(article_path, "%s%s%s.%s", wiki_root, UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
+	_snprintf(article_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
+			  UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
 #else
 	snprintf(article_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
 			 UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);

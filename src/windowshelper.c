@@ -9,6 +9,52 @@
 #ifdef WINDOWS
 
 /**
+ * Prints to the debug console. Just like printf.
+ *
+ * @param format String format as if it was printf.
+ * @param ...    All your variables to be inserted into the format string.
+ */
+void PrintDebug(const char* format, ...) {
+	va_list argptr;
+	LPTSTR szMsg;
+	char buffer[4084];
+
+	// Build the string with sprintf.
+	va_start(argptr, format);
+	vsprintf(buffer, format, argptr);
+	va_end(argptr);
+
+	// Convert string to Unicode.
+	if (!StringAtoW(&szMsg, buffer)) {
+		OutputDebugString(L"Error while converting string to unicode.\r\n");
+		return;
+	}
+
+	// Print to debug console.
+	OutputDebugString(szMsg);
+	free(szMsg);
+}
+
+/**
+ * Converts a regular ASCII string into a Unicode string.
+ *
+ * @param  szUnicode Unicode string allocated by this function.
+ * @param  szASCII   Original ASCII string.
+ * @return           TRUE if the conversion was successful.
+ */
+BOOL StringAtoW(LPTSTR *szUnicode, const char *szASCII) {
+	size_t nLen = strlen(szASCII) + 1;
+    *szUnicode = (LPTSTR)malloc(nLen * sizeof(wchar_t));
+
+    if(MultiByteToWideChar(CP_ACP, 0, szASCII, -1, *szUnicode, nLen) == 0) {
+		free(*szUnicode);
+		return FALSE;
+    }
+    
+    return TRUE;
+}
+
+/**
  * Reads a single line from a file.
  *
  * @param  lineptr Pointer to the line string. Allocated by this function.

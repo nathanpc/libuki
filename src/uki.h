@@ -12,6 +12,7 @@
 #include "constants.h"
 #include "config.h"
 
+// Define Windows DLL export and import macro.
 #ifdef WINDOWS
 #ifdef UKI_DLL_EXPORTS
 #define DLL_API __declspec(dllexport)

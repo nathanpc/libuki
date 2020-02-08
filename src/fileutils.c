@@ -89,14 +89,29 @@ size_t slurp_file(char **contents, const char *fname) {
  * @param  fpath File path to be checked.
  * @return       TRUE if the file exists.
  */
+bool file_exists(const char *fpath) {
 #ifdef WINDOWS
-bool file_exists(LPCTSTR fpath) {
-	DWORD dwAttrib = GetFileAttributes(fpath);
-	
+	DWORD dwAttrib;
+#ifdef WINCE
+	LPTSTR szPath;
+
+	// Convert path string to Unicode.
+	if (!StringAtoW(&szPath, fpath)) {
+		printf("ERROR: String conversion from ASCII to Unicode failed: '%s'\r\n",
+			fpath);
+		return false;
+	}
+
+	// Get file attributes and free the path string.
+	dwAttrib = GetFileAttributes(szPath);
+	free(szPath);
+#else
+	dwAttrib = GetFileAttributes(fpath);
+#endif
+
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
 		!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 #else
-bool file_exists(const char *fpath) {
 	return access(fpath, F_OK) != -1;
 #endif
 }
