@@ -76,7 +76,8 @@ bool populate_variables(uki_variable_container *container, const char *fname) {
  * @param container Variable container to be emptied.
  */
 void free_variables(uki_variable_container container) {
-	for (uint8_t i = 0; i < container.size; i++) {
+	uint8_t i;
+	for (i = 0; i < container.size; i++) {
 		free(container.list[i].key);
 		free(container.list[i].value);
 	}
@@ -90,19 +91,20 @@ void free_variables(uki_variable_container container) {
  *
  * @param  index     Variable index.
  * @param  container Variable container to search into.
- * @param  var       The variable structure if it was found. NULL otherwise.
- * @return           TRUE if the variable was found.
+ * @return           The variable structure if it was found. NULL otherwise.
  */
-bool find_variable_i(const uint8_t index, const uki_variable_container container,
-					 uki_variable_t *var) {
+uki_variable_t find_variable_i(const uint8_t index, const uki_variable_container container) {
 	// Check if the index is out of bounds.
 	if (index >= container.size) {
-		var = NULL;
-		return false;
+		uki_variable_t nl;
+		nl.key = NULL;
+		nl.value = NULL;
+
+		return nl;
 	}
 
-	*var = container.list[index];
-	return true;
+	return container.list[index];
+	//return true;
 }
 
 /**
@@ -114,7 +116,8 @@ bool find_variable_i(const uint8_t index, const uki_variable_container container
  *                   otherwise.
  */
 int find_variable(const char *key, const uki_variable_container container) {
-	for (uint8_t i = 0; i < container.size; i++) {
+	uint8_t i;
+	for (i = 0; i < container.size; i++) {
 		if (strcmp(key, container.list[i].key) == 0) {
 			return i;
 		}

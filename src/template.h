@@ -8,8 +8,12 @@
 #ifndef _TEMPLATE_H_
 #define _TEMPLATE_H_
 
-#include <stdbool.h>
+#include "windowshelper.h"
 #include "config.h"
+
+#ifndef WINDOWS
+#include <stdbool.h>
+#endif
 
 void initialize_templating(const char *_wiki_root);
 int render_template(char **rendered, const char *template_name);

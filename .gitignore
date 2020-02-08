@@ -5,6 +5,13 @@ test/
 *.o
 *.so
 build/
+Debug/
+
+# Visual Studio.
+*.plg
+*.opt
+*.vbw
+*.ncb
 
 # Debugging artifacts.
 valgrind*

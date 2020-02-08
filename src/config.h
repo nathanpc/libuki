@@ -8,9 +8,12 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#include "windowshelper.h"
+#ifndef WINDOWS
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#endif
 
 // Variable limits.
 #define VARIABLE_KEY_MAX_CHAR   50
@@ -32,8 +35,9 @@ typedef struct {
 void initialize_variables(uki_variable_container *container);
 bool populate_variables(uki_variable_container *container, const char *fname);
 void free_variables(uki_variable_container container);
-bool find_variable_i(const uint8_t index, const uki_variable_container container,
-					 uki_variable_t *var);
+//bool find_variable_i(const uint8_t index, const uki_variable_container container,
+//					 uki_variable_t *var);
+uki_variable_t find_variable_i(const uint8_t index, const uki_variable_container container);
 int find_variable(const char *key, const uki_variable_container container);
 
 #endif /* _CONFIG_H_ */

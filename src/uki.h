@@ -8,21 +8,32 @@
 #ifndef _UKI_H_
 #define _UKI_H_
 
+#include "windowshelper.h"
 #include "constants.h"
 #include "config.h"
 
+#ifdef WINDOWS
+#ifdef UKI_DLL_EXPORTS
+#define DLL_API __declspec(dllexport)
+#else
+#define DLL_API __declspec(dllimport)
+#endif
+#else
+#define DLL_API extern
+#endif
+
 // Error handling.
-extern const char* uki_error_msg(const int ecode);
+DLL_API const char* uki_error_msg(const int ecode);
 
 // Initialization and destruction.
-extern int uki_initialize(const char *wiki_path);
-extern void uki_clean();
+DLL_API int uki_initialize(const char *wiki_path);
+DLL_API void uki_clean();
 
 // Configuration and variables.
-extern bool uki_config(const uint8_t index, uki_variable_t *var);
-extern bool uki_variable(const uint8_t index, uki_variable_t *var);
+DLL_API uki_variable_t uki_config(const uint8_t index);
+DLL_API uki_variable_t uki_variable(const uint8_t index);
 
 // Rendering.
-extern int uki_render_page(char **rendered, const char *page);
+DLL_API int uki_render_page(char **rendered, const char *page);
 
 #endif /* _UKI_H_ */

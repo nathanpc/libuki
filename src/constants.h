@@ -8,6 +8,10 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif
+
 // Return codes.
 #define UKI_OK    1
 #define UKI_ERROR 0

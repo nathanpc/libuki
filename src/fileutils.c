@@ -8,8 +8,10 @@
 #include "fileutils.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
+#ifndef WINDOWS
 #include <unistd.h>
+#include <stdint.h>
+#endif
 
 /**
  * Gets the size of a buffer to hold the whole contents of a file.
@@ -87,6 +89,14 @@ size_t slurp_file(char **contents, const char *fname) {
  * @param  fpath File path to be checked.
  * @return       TRUE if the file exists.
  */
+#ifdef WINDOWS
+bool file_exists(LPCTSTR fpath) {
+	DWORD dwAttrib = GetFileAttributes(fpath);
+	
+	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+		!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+#else
 bool file_exists(const char *fpath) {
 	return access(fpath, F_OK) != -1;
+#endif
 }

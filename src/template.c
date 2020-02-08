@@ -11,7 +11,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifndef WINDOWS
 #include <stdint.h>
+#endif
 
 // Substitution types.
 #define SUBSTITUTE_STRING   0
@@ -74,7 +76,11 @@ int substitute_templates(char **template) {
 		// Continue until we don't have any one left.
 		if (substitute_templates(template) == UKI_OK)
 			return UKI_OK;
+#ifdef WINDOWS
+	} else if ((nmatches == EOF) || (nmatches == 0)) {
+#else
 	} else if (nmatches == EOF) {
+#endif
 		// Finished substituting the templates.
 		return UKI_OK;
 	}
@@ -93,8 +99,12 @@ int substitute_templates(char **template) {
 int render_template(char **rendered, const char *template_name) {
 	// Build template path.
 	char template_path[UKI_MAX_PATH];
+#ifdef WINDOWS
+	sprintf(template_path, "%s%s%s.%s", wiki_root_path, UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
+#else
 	snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root_path,
 			 UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
+#endif
 
 	// Check if there is a template there.
 	if (!file_exists(template_path))
@@ -140,7 +150,11 @@ int render_variables(char **filled_template,
 		err = render_variables(filled_template, variables);
 		if ((err == UKI_OK) || (err ==  UKI_ERROR_VARIABLE_NOTFOUND))
 			return err;
+#ifdef WINDOWS
+	} else if ((nmatches == EOF) || (nmatches == 0)) {
+#else
 	} else if (nmatches == EOF) {
+#endif
 		// Finished substituting the templates.
 		return UKI_OK;
 	}
@@ -157,6 +171,8 @@ int render_variables(char **filled_template,
  * @return                 UKI_OK when the substitution was successful.
  */
 int render_article(char **filled_template, const char *path) {
+	char *article;
+
 	// Check if there is an article there.
 	if (!file_exists(path))
 		return UKI_ERROR_NOARTICLE;
@@ -167,7 +183,6 @@ int render_article(char **filled_template, const char *path) {
 	}
 
 	// Slurp file.
-	char *article;
 	slurp_file(&article, path);
 	if (article == NULL)
 		return UKI_ERROR_PARSING_ARTICLE;

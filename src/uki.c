@@ -5,13 +5,16 @@
  * @author: Nathan Campos <nathan@innoveworkshop.com>
  */
 
+#define UKI_DLL_EXPORTS
 #include "uki.h"
 #include "fileutils.h"
 #include "template.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
+#ifndef WINDOWS
+#include <stdbool.h>
+#endif
 
 // Private variables.
 char *wiki_root;
@@ -21,6 +24,28 @@ uki_variable_container variables;
 // Private methods.
 int populate_variable_container(const char *wiki_root, const char *var_fname,
 								uki_variable_container *container);
+
+#ifdef WINDOWS
+/**
+ * DLL main entry point.
+ *
+ * @param  hModule            Module handler.
+ * @param  ul_reason_for_call Reason for calling this DLL.
+ * @param  lpReserved         Reserved for the future.
+ * @return                    TRUE if the DLL should load.
+ */
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    switch (ul_reason_for_call) {
+		case DLL_PROCESS_ATTACH:
+		case DLL_THREAD_ATTACH:
+		case DLL_THREAD_DETACH:
+		case DLL_PROCESS_DETACH:
+			break;
+    }
+
+    return TRUE;
+}
+#endif
 
 /**
  * Initializes the wiki.
@@ -68,8 +93,12 @@ int uki_render_page(char **rendered, const char *page) {
 		return err;
 
 	// Build article path and render it.
+#ifdef WINDOWS
+	sprintf(article_path, "%s%s%s.%s", wiki_root, UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
+#else
 	snprintf(article_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
 			 UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
+#endif
 	if ((err = render_article(rendered, article_path)) != UKI_OK)
 		return err;
 
@@ -80,22 +109,20 @@ int uki_render_page(char **rendered, const char *page) {
  * Gets a uki configuration by its index.
  *
  * @param  index Configuration index.
- * @param  var   The variable structure if it was found. NULL otherwise.
- * @return       TRUE if the configuration was found.
+ * @return       The variable structure if it was found. NULL otherwise.
  */
-bool uki_config(const uint8_t index, uki_variable_t *var) {
-	return find_variable_i(index, configs, var);
+uki_variable_t uki_config(const uint8_t index) {
+	return find_variable_i(index, configs);
 }
 
 /**
  * Gets a uki variable by its index.
  *
  * @param  index Variable index.
- * @param  var   The variable structure if it was found. NULL otherwise.
- * @return       TRUE if the variable was found.
+ * @return       The variable structure if it was found. NULL otherwise.
  */
-bool uki_variable(const uint8_t index, uki_variable_t *var) {
-	return find_variable_i(index, variables, var);
+uki_variable_t uki_variable(const uint8_t index) {
+	return find_variable_i(index, variables);
 }
 
 /**
