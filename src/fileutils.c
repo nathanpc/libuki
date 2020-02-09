@@ -99,6 +99,9 @@ bool file_exists(const char *fpath) {
 	if (!StringAtoW(&szPath, fpath)) {
 		printf("ERROR: String conversion from ASCII to Unicode failed: '%s'\r\n",
 			fpath);
+		MessageBox(NULL, L"File path string conversion from ASCII to Unicode failed",
+			L"Path Conversion Failed", MB_OK);
+
 		return false;
 	}
 

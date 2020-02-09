@@ -9,10 +9,10 @@
 #define _CONFIG_H_
 
 #include "windowshelper.h"
+#include <stdlib.h>
 #ifndef WINDOWS
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #endif
 
 // Variable limits.
