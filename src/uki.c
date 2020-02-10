@@ -9,6 +9,7 @@
 #include "uki.h"
 #include "fileutils.h"
 #include "template.h"
+#include "article.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -20,6 +21,7 @@
 char *wiki_root;
 uki_variable_container configs;
 uki_variable_container variables;
+uki_article_container articles;
 
 // Private methods.
 int populate_variable_container(const char *wiki_root, const char *var_fname,
@@ -68,6 +70,10 @@ int uki_initialize(const char *wiki_path) {
 
 	// Initialize templating engine.
 	initialize_templating(wiki_root);
+
+	// Initialize and populate the articles container.
+	initialize_articles(&articles, wiki_root);
+	populate_articles(&articles);
 
 	return UKI_OK;
 }
@@ -156,6 +162,10 @@ const char* uki_error_msg(const int ecode) {
 		return "Error occured while parsing a template file.\n";
 	case UKI_ERROR_READING_TEMPLATE:
 		return "Error occured while reading a template file.\n";
+	case UKI_ERROR_DIRLIST_NOTFOUND:
+		return "Couldn't open directory for listing.\n";
+	case UKI_ERROR_DIRLIST_FILEUNKNOWN:
+		return "Your filesystem doesn't support dirent->d_type. Sorry.\n";
 	case UKI_ERROR:
 		return "General error.\n";
 	}
@@ -170,6 +180,7 @@ void uki_clean() {
 	free(wiki_root);
 	free_variables(configs);
 	free_variables(variables);
+	free_articles(articles);
 }
 
 /**

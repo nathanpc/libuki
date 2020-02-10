@@ -17,7 +17,7 @@ TESTARTICLE = something
 TESTRUNLD = LD_LIBRARY_PATH=$(BUILDDIR)/lib:$LD_LIBRARY_PATH
 TESTRUN = ./$(TESTTARGET) $(TESTWIKI) $(TESTARTICLE)
 
-SOURCES += $(SRCDIR)/uki.c $(SRCDIR)/config.c $(SRCDIR)/template.c $(SRCDIR)/fileutils.c
+SOURCES += $(SRCDIR)/uki.c $(SRCDIR)/config.c $(SRCDIR)/template.c $(SRCDIR)/article.c $(SRCDIR)/fileutils.c
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/obj/%,$(SOURCES:.c=.o))
 CFLAGS = -Wall
 LDFLAGS = -shared

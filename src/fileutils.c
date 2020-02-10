@@ -8,10 +8,106 @@
 #include "fileutils.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #ifndef WINDOWS
 #include <unistd.h>
 #include <stdint.h>
+#include <dirent.h>
 #endif
+
+/**
+ * Lists the directory contents and stores it in a directory listing structure.
+ * @remark  If list is NULL this function will return the size of the list to be
+ *          allocated.
+ * @warning Always set the dirlist_t.size to 0 before calling this function.
+ *
+ * @param  list       Directory list container. Allocated by this function.
+ * @param  path       Path to the directory you want to list.
+ * @param  recursive  Should this listing be done recursively?
+ * @return            UKI_OK if everything went OK or list size if list is NULL.
+ */
+ssize_t list_directory_files(dirlist_t *list, const char *path,
+							 const bool recursive) {
+	DIR *dh;
+	struct dirent *dir;
+	char subpath[UKI_MAX_PATH];
+	ssize_t count = 0;
+	ssize_t err;
+
+	// Allocate space for our list if needed.
+	if (list != NULL) {
+		if (list->size == 0) {
+			err = list_directory_files(NULL, path, recursive);
+			if (err < 0)
+				return err;
+
+			// Allocate listing array.
+			list->size = err;
+			list->list = (char**)malloc(err * sizeof(char*));
+		}
+	}
+
+	// Open directory for listing.
+	dh = opendir(path);
+	if (dh == NULL) {
+		return UKI_ERROR_DIRLIST_NOTFOUND;
+	}
+
+	// Read directory contents recursively.
+	while (dir = readdir(dh)) {
+		// Ignore anything that starts with a dot.
+		if (dir->d_name[0] == '.') {
+			continue;
+		}
+
+		// Decide what to do.
+		switch (dir->d_type) {
+		case DT_DIR:
+			// Is a directory, so only do something if we are recursive.
+			if (recursive) {
+				// Build path.
+				snprintf(subpath, UKI_MAX_PATH, "%s/%s", path, dir->d_name);
+
+				// Get listing recursively.
+				err = list_directory_files(list, subpath, recursive);
+				if (err < 0)
+					return err;
+
+				// Add to the count.
+				if (list == NULL)
+					count += err;
+				else
+					count += err + 1;
+			}
+			break;
+		case DT_REG:
+			if (list != NULL) {
+				// Build path to file.
+				snprintf(subpath, UKI_MAX_PATH, "%s/%s", path, dir->d_name);
+
+				// Allocate string.
+				list->list[count] = (char*)malloc((strlen(subpath) + 1) *
+												  sizeof(char));
+				strcpy(list->list[count], subpath);
+			}
+
+			count++;
+			break;
+		case DT_UNKNOWN:
+			return UKI_ERROR_DIRLIST_FILEUNKNOWN;
+		}
+	}
+
+	// Clean up.
+	closedir(dh);
+
+	// Return count if the list it's what we want.
+	if (list == NULL) {
+		return count;
+	}
+
+	return UKI_OK;
+}
 
 /**
  * Gets the size of a buffer to hold the whole contents of a file.
@@ -117,4 +213,18 @@ bool file_exists(const char *fpath) {
 #else
 	return access(fpath, F_OK) != -1;
 #endif
+}
+
+/**
+ * Frees a directory listing structure.
+ *
+ * @param list Directory listing structure to be freed.
+ */
+void free_dirlist(dirlist_t list) {
+	size_t i;
+	for (i = 0; i < list.size; i++) {
+		free(list.list[i]);
+	}
+
+	free(list.list);
 }
