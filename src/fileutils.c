@@ -8,12 +8,60 @@
 #include "fileutils.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #ifndef WINDOWS
 #include <unistd.h>
 #include <stdint.h>
 #include <dirent.h>
 #endif
+
+/**
+ * Concatenates paths together safely. It is assumed that only the last string
+ * is a file. Which means a directory separator will be added between all
+ * strings except the last one.
+ *
+ * @param  npaths     Number of paths to be concatenated.
+ * @param  final_path Pre-allocated pointer to a string buffer.
+ * @param  ...        Paths to be concatenated.
+ * @return            Size of the final buffer.
+ */
+size_t pathcat(int npaths, char *final_path, ...) {
+	va_list ap;
+	int i;
+
+	// Initialize final path.
+	final_path[0] = '\0';
+
+	// Loop through paths.
+	va_start(ap, final_path);
+	for (i = 0; i < npaths; i++) {
+		// TODO: Improve the performance of strcat.
+		strncat(final_path, va_arg(ap, char*), UKI_MAX_PATH - 1);
+
+		if (i < (npaths - 1)) {
+			strncat(final_path, "/", UKI_MAX_PATH - 1);
+		}
+	}
+
+	// TODO: Clean up path to remove duplicate separators.
+
+	return strlen(final_path);
+}
+
+/**
+ * Concatenates an extension to a file path.
+ *
+ * @param  final_path Path to the file without extension.
+ * @param  ext        File extension without the dot.
+ * @return            Size of the final buffer.
+ */
+size_t extcat(char *final_path, const char *ext) {
+	strncat(final_path, ".", UKI_MAX_PATH - 1);
+	strncat(final_path, ext, UKI_MAX_PATH - 1);
+
+	return strlen(final_path);
+}
 
 /**
  * Lists the directory contents and stores it in a directory listing structure.
@@ -66,7 +114,7 @@ ssize_t list_directory_files(dirlist_t *list, const char *path,
 			// Is a directory, so only do something if we are recursive.
 			if (recursive) {
 				// Build path.
-				snprintf(subpath, UKI_MAX_PATH, "%s/%s", path, dir->d_name);
+				pathcat(2, subpath, path, dir->d_name);
 
 				// Get listing recursively.
 				err = list_directory_files(list, subpath, recursive);
@@ -83,7 +131,7 @@ ssize_t list_directory_files(dirlist_t *list, const char *path,
 		case DT_REG:
 			if (list != NULL) {
 				// Build path to file.
-				snprintf(subpath, UKI_MAX_PATH, "%s/%s", path, dir->d_name);
+				pathcat(2, subpath, path, dir->d_name);
 
 				// Allocate string.
 				list->list[count] = (char*)malloc((strlen(subpath) + 1) *

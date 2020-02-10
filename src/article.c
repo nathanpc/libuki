@@ -40,13 +40,7 @@ int populate_articles(uki_article_container *container) {
 	int err;
 
 	// Build article path and render it.
-#ifdef WINDOWS
-	_snprintf(article_path, UKI_MAX_PATH, "%s%s", wiki_root_path,
-			  UKI_ARTICLE_ROOT);
-#else
-	snprintf(article_path, UKI_MAX_PATH, "%s%s", wiki_root_path,
-			 UKI_ARTICLE_ROOT);
-#endif
+	pathcat(2, article_path, wiki_root_path, UKI_ARTICLE_ROOT);
 
 	// Go through the directory.
 	dirlist.size = 0;

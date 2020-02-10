@@ -24,6 +24,8 @@ typedef struct {
 
 void free_dirlist(dirlist_t list);
 bool file_exists(const char *fpath);
+size_t extcat(char *final_path, const char *ext);
+size_t pathcat(int npaths, char *final_path, ...);
 ssize_t list_directory_files(dirlist_t *list, const char *path,
 							 const bool recursive);
 long file_contents_size(const char *fname);

@@ -99,13 +99,8 @@ int substitute_templates(char **template) {
 int render_template(char **rendered, const char *template_name) {
 	// Build template path.
 	char template_path[UKI_MAX_PATH];
-#ifdef WINDOWS
-	_snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root_path,
-			  UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
-#else
-	snprintf(template_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root_path,
-			 UKI_TEMPLATE_ROOT, template_name, UKI_TEMPLATE_EXT);
-#endif
+	pathcat(3, template_path, wiki_root_path, UKI_TEMPLATE_ROOT, template_name);
+	extcat(template_path, UKI_TEMPLATE_EXT);
 
 	// Check if there is a template there.
 	if (!file_exists(template_path))

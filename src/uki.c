@@ -99,13 +99,8 @@ int uki_render_page(char **rendered, const char *page) {
 		return err;
 
 	// Build article path and render it.
-#ifdef WINDOWS
-	_snprintf(article_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
-			  UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
-#else
-	snprintf(article_path, UKI_MAX_PATH, "%s%s%s.%s", wiki_root,
-			 UKI_ARTICLE_ROOT, page, UKI_ARTICLE_EXT);
-#endif
+	pathcat(3, article_path, wiki_root, UKI_ARTICLE_ROOT, page);
+	extcat(article_path, UKI_ARTICLE_EXT);
 	if ((err = render_article(rendered, article_path)) != UKI_OK)
 		return err;
 
