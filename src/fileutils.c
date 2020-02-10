@@ -100,7 +100,7 @@ bool file_exists(const char *fpath) {
 		printf("ERROR: String conversion from ASCII to Unicode failed: '%s'\r\n",
 			fpath);
 		MessageBox(NULL, L"File path string conversion from ASCII to Unicode failed",
-			L"Path Conversion Failed", MB_OK);
+			L"Path Conversion Failed", MB_ICONEXCLAMATION | MB_OK);
 
 		return false;
 	}
