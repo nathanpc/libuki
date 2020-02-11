@@ -37,26 +37,40 @@ int main(const int argc, const char **argv) {
 		return 1;
 	}
 
-#ifdef DEBUG
 	// Print configurations.
-	uki_variable_t *var;
+	uki_variable_t var;
 	uint8_t iv = 0;
+	var = uki_config(iv);
 	printf("Configurations:\n");
-	while (uki_config(iv, var)) {
-		printf("   %s <- %s\n", var->key, var->value);
+	while (var.key != NULL) {
+		printf("   %s <- %s\n", var.key, var.value);
 		iv++;
+		var = uki_config(iv);
 	}
 	printf("\n");
 
 	// Print variables.
-	printf("Variables:\n");
 	iv = 0;
-	while (uki_variable(iv, var)) {
-		printf("   %s <- %s\n", var->key, var->value);
+	var = uki_variable(iv);
+	printf("Variables:\n");
+	while (var.key != NULL) {
+		printf("   %s <- %s\n", var.key, var.value);
 		iv++;
+		var = uki_variable(iv);
 	}
 	printf("\n");
-#endif
+
+	// Print articles.
+	uki_article_t article;
+	size_t ia = 0;
+	printf("Articles:\n");
+	article = uki_article(ia);
+	while (article.name != NULL) {
+		printf("   %s <- %s\n", article.path, article.name);
+		ia++;
+		article = uki_article(ia);
+	}
+	printf("\n");
 
 	// Render a page.
 	char *content;
