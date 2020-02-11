@@ -16,6 +16,10 @@
 #include <dirent.h>
 #endif
 
+// Private methods.
+ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
+							   const char *path, const bool recursive);
+
 /**
  * Concatenates paths together safely. It is assumed that only the last string
  * is a file. Which means a directory separator will be added between all
@@ -98,27 +102,47 @@ size_t cleanup_path(char *path) {
 
 /**
  * Lists the directory contents and stores it in a directory listing structure.
+ * @warning Always set the dirlist_t.size to 0 before calling this function.
+ *
+ * @param  list      Directory list container. Allocated by this function.
+ * @param  path      Path to the directory you want to list.
+ * @param  recursive Should this listing be done recursively?
+ * @return           UKI_OK if everything went OK.
+ */
+ssize_t list_directory_files(dirlist_t *list, const char *path,
+							 const bool recursive) {
+	ssize_t err;
+
+	if ((err = n_list_directory_files(0, list, path, recursive)) < 0)
+		return err;
+
+	return UKI_OK;
+}
+
+/**
+ * Lists the directory contents and stores it in a directory listing structure.
  * @remark  If list is NULL this function will return the size of the list to be
  *          allocated.
  * @warning Always set the dirlist_t.size to 0 before calling this function.
  *
+ * @param  init_count Initial counter position.
  * @param  list       Directory list container. Allocated by this function.
  * @param  path       Path to the directory you want to list.
  * @param  recursive  Should this listing be done recursively?
- * @return            UKI_OK if everything went OK or list size if list is NULL.
+ * @return            Current count if populating or list size if *list is NULL.
  */
-ssize_t list_directory_files(dirlist_t *list, const char *path,
-							 const bool recursive) {
+ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
+							   const char *path, const bool recursive) {
 	DIR *dh;
 	struct dirent *dir;
 	char subpath[UKI_MAX_PATH];
-	ssize_t count = 0;
+	ssize_t count = init_count;
 	ssize_t err;
 
 	// Allocate space for our list if needed.
 	if (list != NULL) {
 		if (list->size == 0) {
-			err = list_directory_files(NULL, path, recursive);
+			err = n_list_directory_files(0, NULL, path, recursive);
 			if (err < 0)
 				return err;
 
@@ -150,15 +174,12 @@ ssize_t list_directory_files(dirlist_t *list, const char *path,
 				pathcat(2, subpath, path, dir->d_name);
 
 				// Get listing recursively.
-				err = list_directory_files(list, subpath, recursive);
+				err = n_list_directory_files(count, list, subpath, recursive);
 				if (err < 0)
 					return err;
 
-				// Add to the count.
-				if (list == NULL)
-					count += err;
-				else
-					count += err + 1;
+				// Count up.
+				count += (err - count);
 			}
 			break;
 		case DT_REG:
@@ -179,15 +200,9 @@ ssize_t list_directory_files(dirlist_t *list, const char *path,
 		}
 	}
 
-	// Clean up.
+	// Clean up and return.
 	closedir(dh);
-
-	// Return count if the list it's what we want.
-	if (list == NULL) {
-		return count;
-	}
-
-	return UKI_OK;
+	return count;
 }
 
 /**
