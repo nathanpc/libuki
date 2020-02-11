@@ -39,7 +39,7 @@ int populate_articles(uki_article_container *container) {
 	dirlist_t dirlist;
 	int err;
 
-	// Build article path and render it.
+	// Build article path root.
 	pathcat(2, article_path, wiki_root_path, UKI_ARTICLE_ROOT);
 
 	// Go through the directory.
@@ -47,10 +47,18 @@ int populate_articles(uki_article_container *container) {
 	if ((err = list_directory_files(&dirlist, article_path, true)) != UKI_OK)
 		return err;
 
-	// TODO: Sort directory listing.
-
+	printf("Unsorted:\n");
 	for (size_t i = 0; i < dirlist.size; i++) {
-		printf("%ld %s\n", i, dirlist.list[i]);
+		printf("   %ld %s\n", i, dirlist.list[i]);
+	}
+	printf("\n");
+
+	// TODO: Sort directory listing.
+	sort_dirlist(&dirlist);
+
+	printf("Sorted:\n");
+	for (size_t i = 0; i < dirlist.size; i++) {
+		printf("   %ld %s\n", i, dirlist.list[i]);
 	}
 
 	// Clean up and return.

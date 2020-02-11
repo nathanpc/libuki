@@ -17,6 +17,8 @@
 #endif
 
 // Private methods.
+int count_dir_deepness(const char *path);
+int sort_dirs_ascending (const void *a, const void *b);
 ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 							   const char *path, const bool recursive);
 
@@ -101,6 +103,15 @@ size_t cleanup_path(char *path) {
 }
 
 /**
+ * Sorts a directory listing alphabetically, giving priority to directories.
+ *
+ * @param list Directory listing structure.
+ */
+void sort_dirlist(dirlist_t *list) {
+	qsort(list->list, list->size, sizeof(char*), sort_dirs_ascending);
+}
+
+/**
  * Lists the directory contents and stores it in a directory listing structure.
  * @warning Always set the dirlist_t.size to 0 before calling this function.
  *
@@ -159,7 +170,7 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 	}
 
 	// Read directory contents recursively.
-	while (dir = readdir(dh)) {
+	while ((dir = readdir(dh)) != NULL) {
 		// Ignore anything that starts with a dot.
 		if (dir->d_name[0] == '.') {
 			continue;
@@ -323,4 +334,41 @@ void free_dirlist(dirlist_t list) {
 	}
 
 	free(list.list);
+}
+
+/**
+ * Counts the relative deepness of a file path.
+ *
+ * @param  path File path string.
+ * @return      Number of slashes found in the file path.
+ */
+int count_dir_deepness(const char *path) {
+	int count;
+	const char *tmp = path;
+
+	for (count = 0; *tmp != '\0'; tmp++) {
+		if (*tmp == '/')
+			count++;
+	}
+
+	return count;
+}
+
+/**
+ * A sorting function to sort directories to be used with qsort. Prioritizing
+ * directories.
+ *
+ * @param  a First parameter to sort.
+ * @param  b Next parameter to sort.
+ * @return   qsort decision integer.
+ */
+int sort_dirs_ascending (const void *a, const void *b) {
+    const char *pa = *(char *const *)a;
+    const char *pb = *(char *const *)b;
+	int da = count_dir_deepness(pa);
+	int db = count_dir_deepness(pb);
+	int dr = db - da;
+
+	// Don't ask me about this. It just works.
+    return dr ? dr : strcmp(pa, pb);
 }
