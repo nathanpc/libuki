@@ -38,27 +38,36 @@ int populate_articles(uki_article_container *container) {
 	char article_path[UKI_MAX_PATH];
 	dirlist_t dirlist;
 	int err;
+	size_t i;
 
 	// Build article path root.
 	pathcat(2, article_path, wiki_root_path, UKI_ARTICLE_ROOT);
 
-	// Go through the directory.
+	// Go through the directory and sort the findings.
 	dirlist.size = 0;
 	if ((err = list_directory_files(&dirlist, article_path, true)) != UKI_OK)
 		return err;
-
-	printf("Unsorted:\n");
-	for (size_t i = 0; i < dirlist.size; i++) {
-		printf("   %ld %s\n", i, dirlist.list[i]);
-	}
-	printf("\n");
-
-	// TODO: Sort directory listing.
 	sort_dirlist(&dirlist);
 
-	printf("Sorted:\n");
-	for (size_t i = 0; i < dirlist.size; i++) {
-		printf("   %ld %s\n", i, dirlist.list[i]);
+	// Push the files into the article container.
+	for (i = 0; i < dirlist.size; i++) {
+		uki_article_t article;
+		char *reldir = dirlist.list[i];
+
+		// Skip the article root directory.
+		reldir += strlen(article_path);
+
+		// Allocate memory for the name and path, and populate them.
+		article.name = (char*)malloc(basename_noext(NULL, reldir) *
+									 sizeof(char));
+		article.path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
+		strcpy(article.path, reldir);
+		basename_noext(article.name, reldir);
+
+		// Push article into the container.
+		container->list = realloc(container->list, sizeof(uki_article_t) *
+								  (container->size + 1));
+		container->list[container->size++] = article;
 	}
 
 	// Clean up and return.

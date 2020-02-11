@@ -63,9 +63,11 @@ int uki_initialize(const char *wiki_path) {
 	strcpy(wiki_root, wiki_path);
 
 	// Populate the variable containers.
-	if ((err = populate_variable_container(wiki_root, UKI_MANIFEST_PATH, &configs)) != UKI_OK)
+	if ((err = populate_variable_container(wiki_root, UKI_MANIFEST_PATH,
+										   &configs)) != UKI_OK)
 		return err;
-	if ((err = populate_variable_container(wiki_root, UKI_VARIABLE_PATH, &variables)) != UKI_OK)
+	if ((err = populate_variable_container(wiki_root, UKI_VARIABLE_PATH,
+										   &variables)) != UKI_OK)
 		return err;
 
 	// Initialize templating engine.
@@ -74,6 +76,11 @@ int uki_initialize(const char *wiki_path) {
 	// Initialize and populate the articles container.
 	initialize_articles(&articles, wiki_root);
 	populate_articles(&articles);
+
+	// Debug: Print articles names.
+	for (size_t i = 0; i < articles.size; i++) {
+		printf("%s  ->  %s\n", articles.list[i].name, articles.list[i].path);
+	}
 
 	return UKI_OK;
 }

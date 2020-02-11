@@ -29,6 +29,7 @@ bool file_exists(const char *fpath);
 size_t cleanup_path(char *path);
 size_t extcat(char *final_path, const char *ext);
 size_t pathcat(int npaths, char *final_path, ...);
+size_t basename_noext(char *fname, const char *path);
 
 // Directory listing.
 void free_dirlist(dirlist_t list);

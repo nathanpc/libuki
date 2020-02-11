@@ -23,6 +23,47 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 							   const char *path, const bool recursive);
 
 /**
+ * Gets just the filename without the extension from a path.
+ * @remark If fname is NULL this function returns the size of the buffer
+ *         to be allocated to fit the file name including the NULL terminator.
+ *
+ * @param fname Pre-allocated string where the file name will be placed.
+ * @param path  File path to extract the file name from.
+ */
+size_t basename_noext(char *fname, const char *path) {
+	const char *tmp = path;
+	const char *lastpos = path;
+	char *buf = fname;
+
+	// Go through the path looking for the slashes.
+	for (; *tmp != '\0'; tmp++) {
+		if (*tmp == '/')
+			lastpos = tmp;
+	}
+
+	// Check for initial slashes.
+	if (*lastpos == '/')
+		lastpos++;
+
+	// Copy the string only if we have it.
+	if (fname != NULL) {
+		// Copy the string until we hit the end or a dot.
+		for (; *lastpos != '\0'; lastpos++) {
+			*buf = *lastpos;
+			if (*lastpos == '.')
+				break;
+			buf++;
+		}
+
+		*buf = '\0';
+		lastpos = fname;
+	}
+
+	// Return the buffer length.
+	return strlen(lastpos) + 1;
+}
+
+/**
  * Concatenates paths together safely. It is assumed that only the last string
  * is a file. Which means a directory separator will be added between all
  * strings except the last one.
