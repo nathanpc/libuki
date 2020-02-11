@@ -22,6 +22,7 @@ typedef struct {
 	char   **list;
 } dirlist_t;
 
+size_t cleanup_path(char *path);
 void free_dirlist(dirlist_t list);
 bool file_exists(const char *fpath);
 size_t extcat(char *final_path, const char *ext);

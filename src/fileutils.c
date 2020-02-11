@@ -43,10 +43,10 @@ size_t pathcat(int npaths, char *final_path, ...) {
 			strncat(final_path, "/", UKI_MAX_PATH - 1);
 		}
 	}
+	va_end(ap);
 
-	// TODO: Clean up path to remove duplicate separators.
-
-	return strlen(final_path);
+	// Clean up path and return.
+	return cleanup_path(final_path);
 }
 
 /**
@@ -57,10 +57,43 @@ size_t pathcat(int npaths, char *final_path, ...) {
  * @return            Size of the final buffer.
  */
 size_t extcat(char *final_path, const char *ext) {
+	// TODO: Improve performance of strcat.
 	strncat(final_path, ".", UKI_MAX_PATH - 1);
 	strncat(final_path, ext, UKI_MAX_PATH - 1);
 
 	return strlen(final_path);
+}
+
+/**
+ * Cleans up a path string and converts it to Windows separators if necessary.
+ *
+ * @param  path File path string.
+ * @return      Final size of the cleaned up path.
+ */
+size_t cleanup_path(char *path) {
+	char *pos;
+
+	// Go through string searching for duplicate slashes.
+	while ((pos = strstr(path, "//")) != NULL) {
+		// Yay! Pointer shenanigans!
+		pos++;
+		*pos = '\0';
+		pos++;
+
+		// Append the rest of the string into itselt.
+		strcat(path, pos);
+	}
+
+#ifdef WINDOWS
+	// Convert UNIX path separators to Windows.
+	pos = path;
+	for (; *pos != '\0'; pos++) {
+		if (*pos == '/')
+			*pos = '\\';
+	}
+#endif
+
+	return strlen(path);
 }
 
 /**

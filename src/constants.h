@@ -28,17 +28,10 @@
 #define UKI_ERROR_DIRLIST_FILEUNKNOWN -32
 
 // Paths.
-#ifdef WINDOWS
-#define UKI_MANIFEST_PATH "\\MANIFEST.uki"
-#define UKI_VARIABLE_PATH "\\VARIABLES.uki"
-#define UKI_ARTICLE_ROOT  "\\pages\\"
-#define UKI_TEMPLATE_ROOT "\\templates\\"
-#else
 #define UKI_MANIFEST_PATH "/MANIFEST.uki"
 #define UKI_VARIABLE_PATH "/VARIABLES.uki"
 #define UKI_ARTICLE_ROOT  "/pages/"
 #define UKI_TEMPLATE_ROOT "/templates/"
-#endif
 #define UKI_ARTICLE_EXT   "html"
 #define UKI_TEMPLATE_EXT  "html"
 
