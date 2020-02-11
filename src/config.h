@@ -32,12 +32,14 @@ typedef struct {
 } uki_variable_container;
 
 
+// Memory management.
 void initialize_variables(uki_variable_container *container);
 bool populate_variables(uki_variable_container *container, const char *fname);
 void free_variables(uki_variable_container container);
-//bool find_variable_i(const uint8_t index, const uki_variable_container container,
-//					 uki_variable_t *var);
-uki_variable_t find_variable_i(const uint8_t index, const uki_variable_container container);
+
+// Lookup.
+uki_variable_t find_variable_i(const uint8_t index,
+							   const uki_variable_container container);
 int find_variable(const char *key, const uki_variable_container container);
 
 #endif /* _CONFIG_H_ */

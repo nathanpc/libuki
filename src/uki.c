@@ -9,7 +9,6 @@
 #include "uki.h"
 #include "fileutils.h"
 #include "template.h"
-#include "article.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -77,11 +76,6 @@ int uki_initialize(const char *wiki_path) {
 	initialize_articles(&articles, wiki_root);
 	populate_articles(&articles);
 
-	// Debug: Print articles names.
-	for (size_t i = 0; i < articles.size; i++) {
-		printf("%s  ->  %s\n", articles.list[i].name, articles.list[i].path);
-	}
-
 	return UKI_OK;
 }
 
@@ -132,6 +126,16 @@ uki_variable_t uki_config(const uint8_t index) {
  */
 uki_variable_t uki_variable(const uint8_t index) {
 	return find_variable_i(index, variables);
+}
+
+/**
+ * Gets a uki article structure by its index.
+ *
+ * @param  index Article index.
+ * @param        The article structure if it was found. NULL otherwise.
+ */
+uki_article_t uki_article(const size_t index) {
+	return find_article_i(index, articles);
 }
 
 /**

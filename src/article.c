@@ -29,6 +29,27 @@ void initialize_articles(uki_article_container *container,
 }
 
 /**
+ * Gets an article by its index.
+ *
+ * @param  index     Article index.
+ * @param  container Article container to search into.
+ * @return           The article structure if it was found. NULL otherwise.
+ */
+uki_article_t find_article_i(const size_t index,
+							 const uki_article_container container) {
+	// Check if the index is out of bounds.
+	if (index >= container.size) {
+		uki_article_t nl;
+		nl.name = NULL;
+		nl.path = NULL;
+
+		return nl;
+	}
+
+	return container.list[index];
+}
+
+/**
  * Populates the articles container.
  *
  * @param  container articles container.

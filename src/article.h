@@ -26,10 +26,14 @@ typedef struct {
 	uki_article_t *list;
 } uki_article_container;
 
-
+// Memory management.
 void initialize_articles(uki_article_container *container,
 						 const char *_wiki_root);
 int populate_articles(uki_article_container *container);
 void free_articles(uki_article_container container);
+
+// Lookup.
+uki_article_t find_article_i(const size_t index,
+							 const uki_article_container container);
 
 #endif /* _ARTICLE_H_ */

@@ -93,7 +93,8 @@ void free_variables(uki_variable_container container) {
  * @param  container Variable container to search into.
  * @return           The variable structure if it was found. NULL otherwise.
  */
-uki_variable_t find_variable_i(const uint8_t index, const uki_variable_container container) {
+uki_variable_t find_variable_i(const uint8_t index,
+							   const uki_variable_container container) {
 	// Check if the index is out of bounds.
 	if (index >= container.size) {
 		uki_variable_t nl;
