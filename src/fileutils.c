@@ -17,7 +17,6 @@
 #endif
 
 // Private methods.
-int count_dir_deepness(const char *path);
 #ifdef WINDOWS
 int __cdecl sort_dirs_ascending (const void *a, const void *b);
 #else
@@ -471,12 +470,16 @@ void free_dirlist(dirlist_t list) {
  * @param  path File path string.
  * @return      Number of slashes found in the file path.
  */
-int count_dir_deepness(const char *path) {
+int path_deepness(const char *path) {
 	int count;
 	const char *tmp = path;
 
 	for (count = 0; *tmp != '\0'; tmp++) {
+#ifdef WINDOWS
+		if (*tmp == '\\')
+#else
 		if (*tmp == '/')
+#endif
 			count++;
 	}
 
@@ -498,8 +501,8 @@ int sort_dirs_ascending (const void *a, const void *b) {
 #endif
     const char *pa = *(char *const *)a;
     const char *pb = *(char *const *)b;
-	int da = count_dir_deepness(pa);
-	int db = count_dir_deepness(pb);
+	int da = path_deepness(pa);
+	int db = path_deepness(pb);
 	int dr = db - da;
 
 	// Don't ask me about this. It just works.

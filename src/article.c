@@ -84,6 +84,7 @@ int populate_articles(uki_article_container *container) {
 		article.path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
 		strcpy(article.path, reldir);
 		basename_noext(article.name, reldir);
+		article.deepness = path_deepness(article.path);
 
 		// Push article into the container.
 		container->list = realloc(container->list, sizeof(uki_article_t) *

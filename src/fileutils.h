@@ -33,6 +33,7 @@ size_t basename_noext(char *fname, const char *path);
 
 // Directory listing.
 void free_dirlist(dirlist_t list);
+int path_deepness(const char *path);
 void sort_dirlist(dirlist_t *list);
 ssize_t list_directory_files(dirlist_t *list, const char *path,
 							 const bool recursive);
