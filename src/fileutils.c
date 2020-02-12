@@ -300,6 +300,9 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 			break;
 #ifdef WINDOWS
 		case FILE_ATTRIBUTE_NORMAL:
+#ifdef WINCE
+		case FILE_ATTRIBUTE_ARCHIVE:
+#endif
 #else
 		case DT_REG:
 #endif

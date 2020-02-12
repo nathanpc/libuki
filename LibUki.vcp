@@ -448,6 +448,121 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\src\article.c
+
+!IF  "$(CFG)" == "LibUki - Win32 (WCE MIPS) Release"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH4) Release"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH4) Debug"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH3) Release"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH3) Debug"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE ARM) Release"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE ARM) Debug"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86) Release"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86) Debug"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86em) Release"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86em) Debug"
+
+DEP_CPP_ARTIC=\
+	".\src\article.h"\
+	".\src\constants.h"\
+	".\src\fileutils.h"\
+	".\src\windowshelper.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\config.c
 
 !IF  "$(CFG)" == "LibUki - Win32 (WCE MIPS) Release"
@@ -621,6 +736,7 @@ DEP_CPP_FILEU=\
 !ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86em) Debug"
 
 DEP_CPP_FILEU=\
+	".\src\constants.h"\
 	".\src\fileutils.h"\
 	".\src\windowshelper.h"\
 	
@@ -883,6 +999,7 @@ DEP_CPP_UKI_C=\
 !ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86em) Debug"
 
 DEP_CPP_UKI_C=\
+	".\src\article.h"\
 	".\src\config.h"\
 	".\src\constants.h"\
 	".\src\fileutils.h"\
@@ -977,6 +1094,10 @@ DEP_CPP_WINDO=\
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\src\article.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\src\config.h

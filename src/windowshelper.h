@@ -20,7 +20,9 @@
 #if defined(_WIN32) || defined(WIN32) || defined(_WIN32_WCE)
 
 // Enable Unicode.
+#ifndef UNICODE
 #define UNICODE
+#endif
 
 // General headers.
 #include <stdlib.h>
