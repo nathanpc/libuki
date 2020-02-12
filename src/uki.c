@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef WINDOWS
+#ifdef UNIX
 #include <stdbool.h>
 #endif
 
@@ -56,6 +56,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
  */
 int uki_initialize(const char *wiki_path) {
 	int err;
+
+	WCHAR sz[100];
+	StringAtoW(sz, "Hello");
 
 	// Copy the wiki root path string.
 	wiki_root = (char*)malloc((strlen(wiki_path) + 1) * sizeof(char));
@@ -172,6 +175,10 @@ const char* uki_error_msg(const int ecode) {
 		return "Couldn't open directory for listing.\n";
 	case UKI_ERROR_DIRLIST_FILEUNKNOWN:
 		return "Your filesystem doesn't support dirent->d_type. Sorry.\n";
+	case UKI_ERROR_CONVERSION_AW:
+		return "String conversion from ASCII to Unicode failed\n";
+	case UKI_ERROR_CONVERSION_WA:
+		return "String conversion from Unicode to ASCII failed\n";
 	case UKI_ERROR:
 		return "General error.\n";
 	}
@@ -205,7 +212,7 @@ int populate_variable_container(const char *wiki_root, const char *var_fname,
 	char *var_path = (char*)malloc(path_len * sizeof(char));
 
 	// Build the wiki variables file path and check for its existance.
-	sprintf(var_path, "%s%s", wiki_root, var_fname);
+	pathcat(2, var_path, wiki_root, var_fname);
 	if (!file_exists(var_path)) {
 		free(var_path);
 		return UKI_ERROR_NOVARIABLES;

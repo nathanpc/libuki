@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#ifndef WINDOWS
+#ifdef UNIX
 #include <unistd.h>
 #include <stdint.h>
 #include <dirent.h>
@@ -18,7 +18,11 @@
 
 // Private methods.
 int count_dir_deepness(const char *path);
+#ifdef WINDOWS
+int __cdecl sort_dirs_ascending (const void *a, const void *b);
+#else
 int sort_dirs_ascending (const void *a, const void *b);
+#endif
 ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 							   const char *path, const bool recursive);
 
@@ -37,12 +41,20 @@ size_t basename_noext(char *fname, const char *path) {
 
 	// Go through the path looking for the slashes.
 	for (; *tmp != '\0'; tmp++) {
+#ifdef WINDOWS
+		if (*tmp == '\\')
+#else
 		if (*tmp == '/')
+#endif
 			lastpos = tmp;
 	}
 
 	// Check for initial slashes.
+#ifdef WINDOWS
+	if (*lastpos == '\\')
+#else
 	if (*lastpos == '/')
+#endif
 		lastpos++;
 
 	// Copy the string only if we have it.
@@ -132,6 +144,17 @@ size_t cleanup_path(char *path) {
 	}
 
 #ifdef WINDOWS
+	// Fix strings that have a mix of Windows and UNIX slashes together.
+	while ((pos = strstr(path, "\\/")) != NULL) {
+		// Yay! Pointer shenanigans!
+		pos++;
+		*pos = '\0';
+		pos++;
+
+		// Append the rest of the string into itselt.
+		strcat(path, pos);
+	}
+
 	// Convert UNIX path separators to Windows.
 	pos = path;
 	for (; *pos != '\0'; pos++) {
@@ -185,11 +208,20 @@ ssize_t list_directory_files(dirlist_t *list, const char *path,
  */
 ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 							   const char *path, const bool recursive) {
-	DIR *dh;
-	struct dirent *dir;
 	char subpath[UKI_MAX_PATH];
 	ssize_t count = init_count;
 	ssize_t err;
+
+#ifdef WINDOWS
+	HANDLE hFind;
+	WIN32_FIND_DATA fndData;
+	char fpath[UKI_MAX_PATH];
+	WCHAR szPathW[UKI_MAX_PATH];
+	char szFilename[UKI_MAX_PATH];
+#else
+	DIR *dh;
+	struct dirent *dir;
+#endif
 
 	// Allocate space for our list if needed.
 	if (list != NULL) {
@@ -204,26 +236,58 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 		}
 	}
 
+#ifdef WINDOWS
+	// Add the wildcard for the file search function and convert to Unicode.
+	pathcat(2, fpath, path, "/*");
+	if (!StringAtoW(szPathW, fpath))
+		return UKI_ERROR_CONVERSION_AW;
+
+	// Find the first file in the directory.
+	hFind = FindFirstFile(szPathW, &fndData);
+#else
 	// Open directory for listing.
 	dh = opendir(path);
 	if (dh == NULL) {
 		return UKI_ERROR_DIRLIST_NOTFOUND;
 	}
+#endif
 
 	// Read directory contents recursively.
+#ifdef WINDOWS
+	while (hFind != INVALID_HANDLE_VALUE) {
+		// Convert the filename to a normal string.
+		if(!StringWtoA(szFilename, fndData.cFileName))
+			return UKI_ERROR_CONVERSION_WA;
+#else
 	while ((dir = readdir(dh)) != NULL) {
+#endif
 		// Ignore anything that starts with a dot.
+#ifdef WINDOWS
+		if (szFilename[0] == '.') {
+			goto nextfile;
+		}
+#else
 		if (dir->d_name[0] == '.') {
 			continue;
 		}
+#endif
 
 		// Decide what to do.
+#ifdef WINDOWS
+		switch (fndData.dwFileAttributes) {
+		case FILE_ATTRIBUTE_DIRECTORY:
+#else
 		switch (dir->d_type) {
 		case DT_DIR:
+#endif
 			// Is a directory, so only do something if we are recursive.
 			if (recursive) {
 				// Build path.
+#ifdef WINDOWS
+				pathcat(2, subpath, path, szFilename);
+#else
 				pathcat(2, subpath, path, dir->d_name);
+#endif
 
 				// Get listing recursively.
 				err = n_list_directory_files(count, list, subpath, recursive);
@@ -234,10 +298,18 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 				count += (err - count);
 			}
 			break;
+#ifdef WINDOWS
+		case FILE_ATTRIBUTE_NORMAL:
+#else
 		case DT_REG:
+#endif
 			if (list != NULL) {
 				// Build path to file.
+#ifdef WINDOWS
+				pathcat(2, subpath, path, szFilename);
+#else
 				pathcat(2, subpath, path, dir->d_name);
+#endif
 
 				// Allocate string.
 				list->list[count] = (char*)malloc((strlen(subpath) + 1) *
@@ -247,13 +319,32 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 
 			count++;
 			break;
+#ifdef UNIX
 		case DT_UNKNOWN:
 			return UKI_ERROR_DIRLIST_FILEUNKNOWN;
+#endif
 		}
+
+#ifdef WINDOWS
+nextfile:
+		// Continue to the next file.
+		if (FindNextFile(hFind, &fndData) == 0) {
+			if (GetLastError() == ERROR_NO_MORE_FILES) {
+				// If there are no more files, close the handle and return.
+				FindClose(hFind);
+				hFind = INVALID_HANDLE_VALUE;
+			} else {
+				return UKI_ERROR;
+			}
+		}
+#endif
 	}
 
-	// Clean up and return.
+#ifdef UNIX
+	// Clean up.
 	closedir(dh);
+#endif
+
 	return count;
 }
 
@@ -336,11 +427,10 @@ size_t slurp_file(char **contents, const char *fname) {
 bool file_exists(const char *fpath) {
 #ifdef WINDOWS
 	DWORD dwAttrib;
-#ifdef WINCE
-	LPTSTR szPath;
+	WCHAR szPath[UKI_MAX_PATH];
 
 	// Convert path string to Unicode.
-	if (!StringAtoW(&szPath, fpath)) {
+	if (!StringAtoW(szPath, fpath)) {
 		printf("ERROR: String conversion from ASCII to Unicode failed: '%s'\r\n",
 			fpath);
 		MessageBox(NULL, L"File path string conversion from ASCII to Unicode failed",
@@ -349,13 +439,8 @@ bool file_exists(const char *fpath) {
 		return false;
 	}
 
-	// Get file attributes and free the path string.
+	// Get file attributes and return.
 	dwAttrib = GetFileAttributes(szPath);
-	free(szPath);
-#else
-	dwAttrib = GetFileAttributes(fpath);
-#endif
-
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
 		!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 #else
@@ -403,7 +488,11 @@ int count_dir_deepness(const char *path) {
  * @param  b Next parameter to sort.
  * @return   qsort decision integer.
  */
+#ifdef WINDOWS
+int __cdecl sort_dirs_ascending (const void *a, const void *b) {
+#else
 int sort_dirs_ascending (const void *a, const void *b) {
+#endif
     const char *pa = *(char *const *)a;
     const char *pb = *(char *const *)b;
 	int da = count_dir_deepness(pa);

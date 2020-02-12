@@ -9,7 +9,7 @@
 #define _ARTICLE_H_
 
 #include "windowshelper.h"
-#ifndef WINDOWS
+#ifdef UNIX
 #include <stdlib.h>
 #include <stdint.h>
 #endif

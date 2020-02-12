@@ -11,7 +11,7 @@
 #include "windowshelper.h"
 #include "config.h"
 
-#ifndef WINDOWS
+#ifdef UNIX
 #include <stdbool.h>
 #endif
 

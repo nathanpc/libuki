@@ -26,6 +26,8 @@
 #define UKI_ERROR_READING_TEMPLATE  -24
 #define UKI_ERROR_DIRLIST_NOTFOUND    -31
 #define UKI_ERROR_DIRLIST_FILEUNKNOWN -32
+#define UKI_ERROR_CONVERSION_AW -41
+#define UKI_ERROR_CONVERSION_WA -42
 
 // Paths.
 #define UKI_MANIFEST_PATH "/MANIFEST.uki"
@@ -39,7 +41,12 @@
 #define UKI_VAR_MAIN_TEMPLATE "main_template"
 
 // Misc.
-#define UKI_MAX_PATH 512
-#define UKI_MAX_TEMPLATE_NAME 50
+#ifdef WINDOWS
+#define UKI_MAX_PATH          MAX_PATH
+#define UKI_MAX_TEMPLATE_NAME MAX_PATH
+#else
+#define UKI_MAX_PATH          PATH_MAX
+#define UKI_MAX_TEMPLATE_NAME NAME_MAX
+#endif
 
 #endif /* _CONSTANTS_H_ */

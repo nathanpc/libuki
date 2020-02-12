@@ -10,7 +10,7 @@
 
 #include "windowshelper.h"
 #include <stdlib.h>
-#ifndef WINDOWS
+#ifdef UNIX
 #include <stdint.h>
 #include <stdbool.h>
 #endif

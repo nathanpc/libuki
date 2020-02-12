@@ -10,7 +10,7 @@
 
 #include "windowshelper.h"
 #include "constants.h"
-#ifndef WINDOWS
+#ifdef UNIX
 #include <sys/types.h>
 #include <stddef.h>
 #include <stdbool.h>
