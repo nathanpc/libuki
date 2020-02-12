@@ -57,9 +57,6 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
 int uki_initialize(const char *wiki_path) {
 	int err;
 
-	WCHAR sz[100];
-	StringAtoW(sz, "Hello");
-
 	// Copy the wiki root path string.
 	wiki_root = (char*)malloc((strlen(wiki_path) + 1) * sizeof(char));
 	strcpy(wiki_root, wiki_path);

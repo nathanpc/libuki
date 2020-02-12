@@ -45,6 +45,8 @@
 #define UKI_MAX_PATH          MAX_PATH
 #define UKI_MAX_TEMPLATE_NAME MAX_PATH
 #else
+#include <limits.h>
+
 #define UKI_MAX_PATH          PATH_MAX
 #define UKI_MAX_TEMPLATE_NAME NAME_MAX
 #endif
