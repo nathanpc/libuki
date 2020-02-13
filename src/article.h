@@ -18,6 +18,7 @@
 typedef struct {
 	char *path;
 	char *name;
+	char *parent;
 	int   deepness;
 } uki_article_t;
 

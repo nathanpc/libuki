@@ -26,9 +26,85 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 							   const char *path, const bool recursive);
 
 /**
+ * Gets the parent folder from a path.
+ * @remark If pdir is NULL this function returns the size of the buffer to be
+ *         allocated to fit the folder name including the NULL terminator.
+ * @remark If there is no parent folder pdir will be set to NULL.
+ *
+ * @param pdir Pre-allocated string where the folder name will be placed.
+ * @param path File path to extract the file name from.
+ */
+size_t parent_dir_name(char *pdir, const char *path) {
+	const char *tmp = path;
+	const char *prevslash = path;
+	const char *lastslash = path;
+	char *buf = pdir;
+	uint8_t slcount = 0;
+
+	// Ignore if the first character is a separator.
+	if (path[0] == '/') {
+		tmp++;
+	}
+
+	// Go through the path looking for last separator.
+	for (; *tmp != '\0'; tmp++) {
+#ifdef WINDOWS
+		if (*tmp == '\\') {
+#else
+		if (*tmp == '/') {
+#endif
+			lastslash = tmp;
+			slcount++;
+		}
+	}
+
+	// Skip the whole thing if you don't have a parent folder.
+	if (slcount == 0) {
+		pdir = NULL;
+		return 0;
+	}
+
+	// Go through the path looking for the previous separator.
+	tmp = path;
+	prevslash = path;
+	for (; tmp != lastslash; tmp++) {
+#ifdef WINDOWS
+		if (*tmp == '\\') {
+#else
+		if (*tmp == '/') {
+#endif
+			prevslash = tmp;
+		}
+	}
+
+	// Check if we stopped at a separator for our previous position.
+#ifdef WINDOWS
+	if (*prevslash == '\\')
+#else
+	if (*prevslash == '/')
+#endif
+		prevslash++;
+
+	// Copy the string only if we have it.
+	if (pdir != NULL) {
+		// Copy the string until we hit the other one.
+		for (; prevslash != lastslash; prevslash++) {
+			*buf = *prevslash;
+			buf++;
+		}
+
+		*buf = '\0';
+		return strlen(pdir);
+	}
+
+	// Return the buffer length.
+	return (lastslash - prevslash) + 1;
+}
+
+/**
  * Gets just the filename without the extension from a path.
- * @remark If fname is NULL this function returns the size of the buffer
- *         to be allocated to fit the file name including the NULL terminator.
+ * @remark If fname is NULL this function returns the size of the buffer to be
+ *         allocated to fit the file name including the NULL terminator.
  *
  * @param fname Pre-allocated string where the file name will be placed.
  * @param path  File path to extract the file name from.
@@ -38,7 +114,7 @@ size_t basename_noext(char *fname, const char *path) {
 	const char *lastpos = path;
 	char *buf = fname;
 
-	// Go through the path looking for the slashes.
+	// Go through the path looking for the separators.
 	for (; *tmp != '\0'; tmp++) {
 #ifdef WINDOWS
 		if (*tmp == '\\')
@@ -48,7 +124,7 @@ size_t basename_noext(char *fname, const char *path) {
 			lastpos = tmp;
 	}
 
-	// Check for initial slashes.
+	// Check if we stopped at a separator.
 #ifdef WINDOWS
 	if (*lastpos == '\\')
 #else

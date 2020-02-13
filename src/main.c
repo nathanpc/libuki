@@ -66,7 +66,8 @@ int main(const int argc, const char **argv) {
 	printf("Articles:\n");
 	article = uki_article(ia);
 	while (article.name != NULL) {
-		printf("   %s <- %s\n", article.path, article.name);
+		printf("   %lu %s  |  %s <- %s\n", article.deepness, article.parent,
+			   article.path, article.name);
 		ia++;
 		article = uki_article(ia);
 	}

@@ -78,13 +78,22 @@ int populate_articles(uki_article_container *container) {
 		// Skip the article root directory.
 		reldir += strlen(article_path);
 
-		// Allocate memory for the name and path, and populate them.
+		// Allocate memory and populate the structure.
 		article.name = (char*)malloc(basename_noext(NULL, reldir) *
 									 sizeof(char));
 		article.path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
-		strcpy(article.path, reldir);
 		basename_noext(article.name, reldir);
+		strcpy(article.path, reldir);
 		article.deepness = path_deepness(article.path);
+
+		// Populate the parent path.
+		if (article.deepness > 0) {
+			article.parent = (char*)malloc(parent_dir_name(NULL, reldir) *
+										   sizeof(char));
+			parent_dir_name(article.parent, reldir);
+		} else {
+			article.parent = NULL;
+		}
 
 		// Push article into the container.
 		container->list = realloc(container->list, sizeof(uki_article_t) *
