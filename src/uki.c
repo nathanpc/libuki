@@ -8,7 +8,6 @@
 #define UKI_DLL_EXPORTS
 #include "uki.h"
 #include "fileutils.h"
-#include "template.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +20,7 @@ char *wiki_root;
 uki_variable_container configs;
 uki_variable_container variables;
 uki_article_container articles;
+uki_template_container templates;
 
 // Private methods.
 int populate_variable_container(const char *wiki_root, const char *var_fname,
@@ -69,12 +69,15 @@ int uki_initialize(const char *wiki_path) {
 										   &variables)) != UKI_OK)
 		return err;
 
-	// Initialize templating engine.
-	initialize_templating(wiki_root);
+	// Initialize templating engine and populate the templates container.
+	initialize_templating(&templates, wiki_root);
+	if ((err = populate_templates(&templates)) != UKI_OK)
+		return err;
 
 	// Initialize and populate the articles container.
 	initialize_articles(&articles, wiki_root);
-	populate_articles(&articles);
+	if ((err = populate_articles(&articles)) != UKI_OK)
+		return err;
 
 	return UKI_OK;
 }
@@ -136,6 +139,16 @@ uki_variable_t uki_variable(const uint8_t index) {
  */
 uki_article_t uki_article(const size_t index) {
 	return find_article_i(index, articles);
+}
+
+/**
+ * Gets a uki template structure by its index.
+ *
+ * @param  index Template index.
+ * @param        The template structure if it was found. NULL otherwise.
+ */
+uki_template_t uki_template(const size_t index) {
+	return find_template_i(index, templates);
 }
 
 /**

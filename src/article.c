@@ -42,6 +42,8 @@ uki_article_t find_article_i(const size_t index,
 		uki_article_t nl;
 		nl.name = NULL;
 		nl.path = NULL;
+		nl.parent = NULL;
+		nl.deepness = 0;
 
 		return nl;
 	}
@@ -52,7 +54,7 @@ uki_article_t find_article_i(const size_t index,
 /**
  * Populates the articles container.
  *
- * @param  container articles container.
+ * @param  container Articles container.
  * @return           UKI_OK if the operation was successful.
  */
 int populate_articles(uki_article_container *container) {
@@ -116,6 +118,7 @@ void free_articles(uki_article_container container) {
 	for (i = 0; i < container.size; i++) {
 		free(container.list[i].path);
 		free(container.list[i].name);
+		free(container.list[i].parent);
 	}
 
 	free(container.list);

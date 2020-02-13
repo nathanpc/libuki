@@ -60,13 +60,26 @@ int main(const int argc, const char **argv) {
 	}
 	printf("\n");
 
+	// Print templates.
+	uki_template_t template;
+	size_t it = 0;
+	printf("Templates:\n");
+	template = uki_template(it);
+	while (template.name != NULL) {
+		printf("   %d %s  |  %s <- %s\n", template.deepness, template.parent,
+			   template.path, template.name);
+		it++;
+		template = uki_template(it);
+	}
+	printf("\n");
+
 	// Print articles.
 	uki_article_t article;
 	size_t ia = 0;
 	printf("Articles:\n");
 	article = uki_article(ia);
 	while (article.name != NULL) {
-		printf("   %lu %s  |  %s <- %s\n", article.deepness, article.parent,
+		printf("   %d %s  |  %s <- %s\n", article.deepness, article.parent,
 			   article.path, article.name);
 		ia++;
 		article = uki_article(ia);

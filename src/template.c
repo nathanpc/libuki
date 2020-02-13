@@ -43,10 +43,113 @@ int substitute_templates(char **template);
 /**
  * Initializes the templating engine.
  *
+ * @param container  Template container.
  * @param _wiki_root Path to the root of the uki wiki.
  */
-void initialize_templating(const char *_wiki_root) {
+void initialize_templating(uki_template_container *container,
+						   const char *_wiki_root) {
 	wiki_root_path = _wiki_root;
+
+	// Initialize the template container.
+	container->size = 0;
+	container->list = malloc(sizeof(uki_template_t));
+}
+
+/**
+ * Get a template by its index.
+ *
+ * @param  index     Template index.
+ * @param  container Template container to search into.
+ * @return           The template structure if it was found. NULL otherwise.
+ */
+uki_template_t find_template_i(const size_t index,
+							   const uki_template_container container) {
+	// Check if the index is out of bounds.
+	if (index >= container.size) {
+		uki_template_t nl;
+		nl.name = NULL;
+		nl.path = NULL;
+		nl.parent = NULL;
+		nl.deepness = 0;
+
+		return nl;
+	}
+
+	return container.list[index];
+}
+
+/**
+ * Populates the templates container.
+ *
+ * @param  container Template container.
+ * @return           UKI_OK if the operation was successful.
+ */
+int populate_templates(uki_template_container *container) {
+	char template_path[UKI_MAX_PATH];
+	dirlist_t dirlist;
+	int err;
+	size_t i;
+
+	// Build template path root.
+	pathcat(2, template_path, wiki_root_path, UKI_TEMPLATE_ROOT);
+
+	// Go through the directory and sort the findings.
+	dirlist.size = 0;
+	if ((err = list_directory_files(&dirlist, template_path, true)) != UKI_OK)
+		return err;
+	sort_dirlist(&dirlist);
+
+	// Push the files into the template container.
+	for (i = 0; i < dirlist.size; i++) {
+		uki_template_t template;
+		char *reldir = dirlist.list[i];
+
+		// Skip the template root directory.
+		reldir += strlen(template_path);
+
+		// Allocate memory and populate the structure.
+		template.name = (char*)malloc(basename_noext(NULL, reldir) *
+									  sizeof(char));
+		template.path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
+		basename_noext(template.name, reldir);
+		strcpy(template.path, reldir);
+		template.deepness = path_deepness(template.path);
+
+		// Populate the parent path.
+		if (template.deepness > 0) {
+			template.parent = (char*)malloc(parent_dir_name(NULL, reldir) *
+											sizeof(char));
+			parent_dir_name(template.parent, reldir);
+		} else {
+			template.parent = NULL;
+		}
+
+		// Push template into the container.
+		container->list = realloc(container->list, sizeof(uki_template_t) *
+								  (container->size + 1));
+		container->list[container->size++] = template;
+	}
+
+	// Clean up and return.
+	free_dirlist(dirlist);
+	return UKI_OK;
+}
+
+/**
+ * Cleans up the mess we left behind.
+ *
+ * @param container Template container to be emptied.
+ */
+void free_templates(uki_template_container container) {
+	size_t i;
+	for (i = 0; i < container.size; i++) {
+		free(container.list[i].path);
+		free(container.list[i].name);
+		free(container.list[i].parent);
+	}
+
+	free(container.list);
+	container.size = 0;
 }
 
 /**
