@@ -62,12 +62,15 @@ int main(const int argc, const char **argv) {
 
 	// Print templates.
 	uki_template_t template;
+	char fpath[UKI_MAX_PATH];
 	size_t it = 0;
 	printf("Templates:\n");
 	template = uki_template(it);
 	while (template.name != NULL) {
 		printf("   %d %s  |  %s <- %s\n", template.deepness, template.parent,
 			   template.path, template.name);
+		uki_template_fpath(fpath, template);
+		printf("      +--> %s\n", fpath);
 		it++;
 		template = uki_template(it);
 	}
@@ -81,6 +84,8 @@ int main(const int argc, const char **argv) {
 	while (article.name != NULL) {
 		printf("   %d %s  |  %s <- %s\n", article.deepness, article.parent,
 			   article.path, article.name);
+		uki_article_fpath(fpath, article);
+		printf("      --> %s\n", fpath);
 		ia++;
 		article = uki_article(ia);
 	}

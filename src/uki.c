@@ -152,6 +152,32 @@ uki_template_t uki_template(const size_t index) {
 }
 
 /**
+ * Creates a file path to an article.
+ *
+ * @param  fpath   Pre-allocated string buffer to store the article file path.
+ * @param  article Article structure.
+ * @return         UKI_OK if the operation was successful.
+ */
+int uki_article_fpath(char *fpath, const uki_article_t article) {
+	// Build article path.
+	pathcat(3, fpath, wiki_root, UKI_ARTICLE_ROOT, article.path);
+	return UKI_OK;
+}
+
+/**
+ * Creates a file path to a template.
+ *
+ * @param  fpath    Pre-allocated string buffer to store the template file path.
+ * @param  template Template structure.
+ * @return          UKI_OK if the operation was successful.
+ */
+int uki_template_fpath(char *fpath, const uki_template_t template) {
+	// Build template path.
+	pathcat(3, fpath, wiki_root, UKI_TEMPLATE_ROOT, template.path);
+	return UKI_OK;
+}
+
+/**
  * Gets a error message beased on a error code from uki.
  *
  * @param  ecode Error code.
