@@ -17,6 +17,7 @@
 
 // Private variables.
 char *wiki_root;
+bool uki_initialized = false;
 uki_variable_container configs;
 uki_variable_container variables;
 uki_article_container articles;
@@ -56,6 +57,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
  */
 int uki_initialize(const char *wiki_path) {
 	int err;
+	uki_initialized = true;
 
 	// Copy the wiki root path string.
 	wiki_root = (char*)malloc((strlen(wiki_path) + 1) * sizeof(char));
@@ -226,10 +228,12 @@ const char* uki_error_msg(const int ecode) {
  * Clean up our mess.
  */
 void uki_clean() {
-	free(wiki_root);
-	free_variables(configs);
-	free_variables(variables);
-	free_articles(articles);
+	if (uki_initialized) {
+		free(wiki_root);
+		free_variables(configs);
+		free_variables(variables);
+		free_articles(articles);
+	}
 }
 
 /**
