@@ -27,6 +27,7 @@
 
 // Global variables.
 const char *wiki_root_path;
+char template_path[UKI_MAX_PATH];
 
 // Position structure.
 typedef struct {
@@ -39,6 +40,8 @@ spos_t substpos(const char *haystack, const char *needle, const uint8_t type);
 void replace_string(char **haystack, const char *needle, const char *substr,
 					const uint8_t type);
 int substitute_templates(char **template);
+void populate_template_from_path(uki_template_t *template, const char *fpath);
+void push_template(uki_template_container *container, uki_template_t template);
 
 /**
  * Initializes the templating engine.
@@ -48,7 +51,9 @@ int substitute_templates(char **template);
  */
 void initialize_templating(uki_template_container *container,
 						   const char *_wiki_root) {
+	// Initialize paths.
 	wiki_root_path = _wiki_root;
+	pathcat(2, template_path, wiki_root_path, UKI_TEMPLATE_ROOT);
 
 	// Initialize the template container.
 	container->size = 0;
@@ -79,19 +84,76 @@ uki_template_t find_template_i(const size_t index,
 }
 
 /**
+ * Pushes a template into the container.
+ *
+ * @param container Template container.
+ * @param template  Template structure to be added.
+ */
+void push_template(uki_template_container *container, uki_template_t template) {
+	container->list = realloc(container->list, sizeof(uki_template_t) *
+							  (container->size + 1));
+	container->list[container->size++] = template;
+}
+
+/**
+ * Populates a template structure using a file path.
+ * @remark This function ignores the template root path, but it must be present.
+ *
+ * @param template Template structure to be populated.
+ * @param fpath    Complete file path. Template root part will be ignored.
+ */
+void populate_template_from_path(uki_template_t *template, const char *fpath) {
+	const char *reldir = fpath;
+
+	// Skip the template root directory.
+	reldir += strlen(template_path);
+
+	// Allocate memory and populate the structure.
+	template->name = (char*)malloc(basename_noext(NULL, reldir) *
+								   sizeof(char));
+	template->path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
+	basename_noext(template->name, reldir);
+	strcpy(template->path, reldir);
+	template->deepness = path_deepness(template->path);
+
+	// Populate the parent path.
+	if (template->deepness > 0) {
+		template->parent = (char*)malloc(parent_dir_name(NULL, reldir) *
+										 sizeof(char));
+		parent_dir_name(template->parent, reldir);
+	} else {
+		template->parent = NULL;
+	}
+}
+
+/**
+ * Adds a template to the container by its path.
+ *
+ * @param  container Template container.
+ * @param  fpath     Complete path to the template.
+ * @return           The recently added template.
+ */
+uki_template_t add_template(uki_template_container *container,
+							const char *fpath) {
+	uki_template_t template;
+
+	// Populate template and push it into the container.
+	populate_template_from_path(&template, fpath);
+	push_template(container, template);
+
+	return template;
+}
+
+/**
  * Populates the templates container.
  *
  * @param  container Template container.
  * @return           UKI_OK if the operation was successful.
  */
 int populate_templates(uki_template_container *container) {
-	char template_path[UKI_MAX_PATH];
 	dirlist_t dirlist;
 	int err;
 	size_t i;
-
-	// Build template path root.
-	pathcat(2, template_path, wiki_root_path, UKI_TEMPLATE_ROOT);
 
 	// Go through the directory and sort the findings.
 	dirlist.size = 0;
@@ -101,33 +163,7 @@ int populate_templates(uki_template_container *container) {
 
 	// Push the files into the template container.
 	for (i = 0; i < dirlist.size; i++) {
-		uki_template_t template;
-		char *reldir = dirlist.list[i];
-
-		// Skip the template root directory.
-		reldir += strlen(template_path);
-
-		// Allocate memory and populate the structure.
-		template.name = (char*)malloc(basename_noext(NULL, reldir) *
-									  sizeof(char));
-		template.path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
-		basename_noext(template.name, reldir);
-		strcpy(template.path, reldir);
-		template.deepness = path_deepness(template.path);
-
-		// Populate the parent path.
-		if (template.deepness > 0) {
-			template.parent = (char*)malloc(parent_dir_name(NULL, reldir) *
-											sizeof(char));
-			parent_dir_name(template.parent, reldir);
-		} else {
-			template.parent = NULL;
-		}
-
-		// Push template into the container.
-		container->list = realloc(container->list, sizeof(uki_template_t) *
-								  (container->size + 1));
-		container->list[container->size++] = template;
+		add_template(container, dirlist.list[i]);
 	}
 
 	// Clean up and return.

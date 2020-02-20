@@ -144,6 +144,16 @@ uki_article_t uki_article(const size_t index) {
 }
 
 /**
+ * Add a new article.
+ *
+ * @param  article_path Complete path to the article file.
+ * @return              Recently added article.
+ */
+uki_article_t uki_add_article(const char *article_path) {
+	return add_article(&articles, article_path);
+}
+
+/**
  * Gets a uki template structure by its index.
  *
  * @param  index Template index.
@@ -151,6 +161,16 @@ uki_article_t uki_article(const size_t index) {
  */
 uki_template_t uki_template(const size_t index) {
 	return find_template_i(index, templates);
+}
+
+/**
+ * Add a new template.
+ *
+ * @param  template_path Complete path to the template file.
+ * @return               Recently added template.
+ */
+uki_template_t uki_add_template(const char *template_path) {
+	return add_template(&templates, template_path);
 }
 
 /**

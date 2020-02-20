@@ -32,6 +32,8 @@ typedef struct {
 // Memory management.
 void initialize_templating(uki_template_container *container,
 						   const char *_wiki_root);
+uki_template_t add_template(uki_template_container *container,
+							const char *fpath);
 int populate_templates(uki_template_container *container);
 void free_templates(uki_template_container container);
 

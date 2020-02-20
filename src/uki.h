@@ -38,6 +38,10 @@ DLL_API uki_variable_t uki_variable(const uint8_t index);
 DLL_API uki_article_t uki_article(const size_t index);
 DLL_API uki_template_t uki_template(const size_t index);
 
+// Asset management.
+DLL_API uki_article_t uki_add_article(const char *article_path);
+DLL_API uki_template_t uki_add_template(const char *template_path);
+
 // Paths.
 DLL_API int uki_article_fpath(char *fpath, const uki_article_t article);
 DLL_API int uki_template_fpath(char *fpath, const uki_template_t template);

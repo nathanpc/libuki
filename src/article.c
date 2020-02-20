@@ -13,6 +13,11 @@
 
 // Global variables.
 const char *wiki_root_path;
+char article_path[UKI_MAX_PATH];
+
+// Private methods.
+void push_article(uki_article_container *container, uki_article_t article);
+void populate_article_from_path(uki_article_t *article, const char *fpath);
 
 /**
  * Initializes an article container.
@@ -22,7 +27,9 @@ const char *wiki_root_path;
  */
 void initialize_articles(uki_article_container *container,
 						 const char *_wiki_root) {
+	// Initialize paths.
 	wiki_root_path = _wiki_root;
+	pathcat(2, article_path, wiki_root_path, UKI_ARTICLE_ROOT);
 
 	container->size = 0;
 	container->list = malloc(sizeof(uki_article_t));
@@ -52,19 +59,75 @@ uki_article_t find_article_i(const size_t index,
 }
 
 /**
+ * Pushes an article into the container.
+ *
+ * @param container Article container.
+ * @param article   Article structure to be added.
+ */
+void push_article(uki_article_container *container, uki_article_t article) {
+	container->list = realloc(container->list, sizeof(uki_article_t) *
+							  (container->size + 1));
+	container->list[container->size++] = article;
+}
+
+/**
+ * Populates an article structure using a file path.
+ * @remark This function ignores the article root path, but it must be present.
+ *
+ * @param article Article structure to be populated.
+ * @param fpath   Complete file path. Article root part will be ignored.
+ */
+void populate_article_from_path(uki_article_t *article, const char *fpath) {
+	const char *reldir = fpath;
+
+	// Skip the article root directory.
+	reldir += strlen(article_path);
+
+	// Allocate memory and populate the structure.
+	article->name = (char*)malloc(basename_noext(NULL, reldir) *
+								  sizeof(char));
+	article->path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
+	basename_noext(article->name, reldir);
+	strcpy(article->path, reldir);
+	article->deepness = path_deepness(article->path);
+
+	// Populate the parent path.
+	if (article->deepness > 0) {
+		article->parent = (char*)malloc(parent_dir_name(NULL, reldir) *
+										sizeof(char));
+		parent_dir_name(article->parent, reldir);
+	} else {
+		article->parent = NULL;
+	}
+}
+
+/**
+ * Adds an article to the container by its path.
+ *
+ * @param  container Article container.
+ * @param  fpath     Complete path to the article.
+ * @return           The recently added article.
+ */
+uki_article_t add_article(uki_article_container *container, const char *fpath) {
+	uki_article_t article;
+
+	// Populate article and push it into the container.
+	populate_article_from_path(&article, fpath);
+	push_article(container, article);
+
+	return article;
+}
+
+/**
  * Populates the articles container.
  *
  * @param  container Articles container.
  * @return           UKI_OK if the operation was successful.
  */
 int populate_articles(uki_article_container *container) {
-	char article_path[UKI_MAX_PATH];
 	dirlist_t dirlist;
 	int err;
 	size_t i;
-
-	// Build article path root.
-	pathcat(2, article_path, wiki_root_path, UKI_ARTICLE_ROOT);
 
 	// Go through the directory and sort the findings.
 	dirlist.size = 0;
@@ -74,33 +137,7 @@ int populate_articles(uki_article_container *container) {
 
 	// Push the files into the article container.
 	for (i = 0; i < dirlist.size; i++) {
-		uki_article_t article;
-		char *reldir = dirlist.list[i];
-
-		// Skip the article root directory.
-		reldir += strlen(article_path);
-
-		// Allocate memory and populate the structure.
-		article.name = (char*)malloc(basename_noext(NULL, reldir) *
-									 sizeof(char));
-		article.path = (char*)malloc((strlen(reldir) + 1) * sizeof(char));
-		basename_noext(article.name, reldir);
-		strcpy(article.path, reldir);
-		article.deepness = path_deepness(article.path);
-
-		// Populate the parent path.
-		if (article.deepness > 0) {
-			article.parent = (char*)malloc(parent_dir_name(NULL, reldir) *
-										   sizeof(char));
-			parent_dir_name(article.parent, reldir);
-		} else {
-			article.parent = NULL;
-		}
-
-		// Push article into the container.
-		container->list = realloc(container->list, sizeof(uki_article_t) *
-								  (container->size + 1));
-		container->list[container->size++] = article;
+		add_article(container, dirlist.list[i]);
 	}
 
 	// Clean up and return.
