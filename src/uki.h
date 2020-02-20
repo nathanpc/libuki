@@ -33,6 +33,10 @@ DLL_API int uki_initialize(const char *wiki_path);
 DLL_API void uki_clean();
 
 // Lookup.
+DLL_API size_t uki_configs_available();
+DLL_API size_t uki_variables_available();
+DLL_API size_t uki_articles_available();
+DLL_API size_t uki_templates_available();
 DLL_API uki_variable_t uki_config(const uint8_t index);
 DLL_API uki_variable_t uki_variable(const uint8_t index);
 DLL_API uki_article_t uki_article(const size_t index);

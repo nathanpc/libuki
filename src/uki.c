@@ -114,6 +114,15 @@ int uki_render_page(char **rendered, const char *page) {
 }
 
 /**
+ * Gets the number of available configurations.
+ *
+ * @return Number of available configurations.
+ */
+size_t uki_configs_available() {
+	return configs.size;
+}
+
+/**
  * Gets a uki configuration by its index.
  *
  * @param  index Configuration index.
@@ -124,6 +133,15 @@ uki_variable_t uki_config(const uint8_t index) {
 }
 
 /**
+ * Gets the number of available variables.
+ *
+ * @return Number of available variables.
+ */
+size_t uki_variables_available() {
+	return variables.size;
+}
+
+/**
  * Gets a uki variable by its index.
  *
  * @param  index Variable index.
@@ -131,6 +149,15 @@ uki_variable_t uki_config(const uint8_t index) {
  */
 uki_variable_t uki_variable(const uint8_t index) {
 	return find_variable_i(index, variables);
+}
+
+/**
+ * Gets the number of available articles.
+ *
+ * @return Number of available articles.
+ */
+size_t uki_articles_available() {
+	return articles.size;
 }
 
 /**
@@ -151,6 +178,15 @@ uki_article_t uki_article(const size_t index) {
  */
 uki_article_t uki_add_article(const char *article_path) {
 	return add_article(&articles, article_path);
+}
+
+/**
+ * Gets the number of available templates.
+ *
+ * @return Number of available templates.
+ */
+size_t uki_templates_available() {
+	return templates.size;
 }
 
 /**

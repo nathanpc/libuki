@@ -67,25 +67,18 @@ int main(const int argc, const char **argv) {
  */
 void print_variables() {
 	// Print configurations.
-	uki_variable_t var;
-	uint8_t iv = 0;
-	var = uki_config(iv);
 	printf("Configurations:\n");
-	while (var.key != NULL) {
+	for (size_t i = 0; i < uki_configs_available(); i++) {
+		uki_variable_t var = uki_config(i);
 		printf("   %s <- %s\n", var.key, var.value);
-		iv++;
-		var = uki_config(iv);
 	}
 	printf("\n");
 
 	// Print variables.
-	iv = 0;
-	var = uki_variable(iv);
 	printf("Variables:\n");
-	while (var.key != NULL) {
+	for (size_t i = 0; i < uki_variables_available(); i++) {
+		uki_variable_t var = uki_variable(i);
 		printf("   %s <- %s\n", var.key, var.value);
-		iv++;
-		var = uki_variable(iv);
 	}
 	printf("\n");
 }
@@ -94,21 +87,17 @@ void print_variables() {
  * Prints a list of the templates.
  */
 void print_templates_list() {
-	uki_template_t template;
-	char fpath[UKI_MAX_PATH];
-	size_t it = 0;
-
 	printf("Templates:\n");
-	template = uki_template(it);
-	while (template.name != NULL) {
+
+	for (size_t i = 0; i < uki_templates_available(); i++) {
+		uki_template_t template = uki_template(i);
+		char fpath[UKI_MAX_PATH];
+
 		printf("   %d %s  |  %s <- %s\n", template.deepness, template.parent,
 			   template.path, template.name);
 
 		uki_template_fpath(fpath, template);
 		printf("      +--> %s\n", fpath);
-
-		it++;
-		template = uki_template(it);
 	}
 
 	printf("\n");
@@ -118,21 +107,17 @@ void print_templates_list() {
  * Prints a list of the articles.
  */
 void print_articles_list() {
-	uki_article_t article;
-	char fpath[UKI_MAX_PATH];
-	size_t ia = 0;
-
 	printf("Articles:\n");
-	article = uki_article(ia);
-	while (article.name != NULL) {
+
+	for (size_t i = 0; i < uki_articles_available(); i++) {
+		uki_article_t article = uki_article(i);
+		char fpath[UKI_MAX_PATH];
+
 		printf("   %d %s  |  %s <- %s\n", article.deepness, article.parent,
 			   article.path, article.name);
 
 		uki_article_fpath(fpath, article);
 		printf("      --> %s\n", fpath);
-
-		ia++;
-		article = uki_article(ia);
 	}
 
 	printf("\n");
