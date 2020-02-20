@@ -11,6 +11,9 @@
 
 // Private methods.
 void usage();
+void print_variables();
+void print_templates_list();
+void print_articles_list();
 
 
 /**
@@ -37,6 +40,32 @@ int main(const int argc, const char **argv) {
 		return 1;
 	}
 
+	// Print our current state.
+	print_variables();
+	print_templates_list();
+	print_articles_list();
+
+	// Render a page.
+	char *content;
+	if ((uki_error = uki_render_page(&content, argv[2])) != UKI_OK) {
+		fprintf(stderr, "ERROR: %s", uki_error_msg(uki_error));
+		uki_clean();
+
+		return 1;
+	}
+
+	// Print the page content.
+	printf("%s\n", content);
+
+	// Clean up and return.
+	uki_clean();
+	return 0;
+}
+
+/**
+ * Prints the configurations.
+ */
+void print_variables() {
 	// Print configurations.
 	uki_variable_t var;
 	uint8_t iv = 0;
@@ -59,53 +88,54 @@ int main(const int argc, const char **argv) {
 		var = uki_variable(iv);
 	}
 	printf("\n");
+}
 
-	// Print templates.
+/**
+ * Prints a list of the templates.
+ */
+void print_templates_list() {
 	uki_template_t template;
 	char fpath[UKI_MAX_PATH];
 	size_t it = 0;
+
 	printf("Templates:\n");
 	template = uki_template(it);
 	while (template.name != NULL) {
 		printf("   %d %s  |  %s <- %s\n", template.deepness, template.parent,
 			   template.path, template.name);
+
 		uki_template_fpath(fpath, template);
 		printf("      +--> %s\n", fpath);
+
 		it++;
 		template = uki_template(it);
 	}
-	printf("\n");
 
-	// Print articles.
+	printf("\n");
+}
+
+/**
+ * Prints a list of the articles.
+ */
+void print_articles_list() {
 	uki_article_t article;
+	char fpath[UKI_MAX_PATH];
 	size_t ia = 0;
+
 	printf("Articles:\n");
 	article = uki_article(ia);
 	while (article.name != NULL) {
 		printf("   %d %s  |  %s <- %s\n", article.deepness, article.parent,
 			   article.path, article.name);
+
 		uki_article_fpath(fpath, article);
 		printf("      --> %s\n", fpath);
+
 		ia++;
 		article = uki_article(ia);
 	}
+
 	printf("\n");
-
-	// Render a page.
-	char *content;
-	if ((uki_error = uki_render_page(&content, argv[2])) != UKI_OK) {
-		fprintf(stderr, "ERROR: %s", uki_error_msg(uki_error));
-		uki_clean();
-
-		return 1;
-	}
-
-	// Print the page content.
-	printf("%s\n", content);
-
-	// Clean up and return.
-	uki_clean();
-	return 0;
 }
 
 /**
