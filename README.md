@@ -8,9 +8,10 @@ everything related to a μki wiki. It's designed to be extremely embeddable.
 ## Library Usage
 
 Using the library couldn't be any simpler. You can check out a more complete
-example by looking at the [`src/main.c`](/src/main.c) file. Anyway, this is
-a simple way to render a page given a `wiki_path` (the root of the μki) and
-a `page_name`:
+example by looking at the [`src/main.c`](/src/main.c) file, which contains
+basically anything you might want to do with the library. Anyway, this is a
+simple way to render a page given a `wiki_path` (the root of the μki) and a
+`page_name`:
 
 ```c
 #include <stdio.h>
