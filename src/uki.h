@@ -49,6 +49,8 @@ DLL_API uki_template_t uki_add_template(const char *template_path);
 // Paths.
 DLL_API int uki_article_fpath(char *fpath, const uki_article_t article);
 DLL_API int uki_template_fpath(char *fpath, const uki_template_t template);
+DLL_API int uki_folder_articles(char *fpath);
+DLL_API int uki_folder_templates(char *fpath);
 
 // Rendering.
 DLL_API int uki_render_page(char **rendered, const char *page);

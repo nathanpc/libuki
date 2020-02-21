@@ -236,6 +236,30 @@ int uki_template_fpath(char *fpath, const uki_template_t template) {
 }
 
 /**
+ * Gets the path to the articles folder.
+ *
+ * @param  fpath Pre-allocated string buffer to store the articles folder path.
+ * @return       UKI_OK if the operation was successful.
+ */
+int uki_folder_articles(char *fpath) {
+	// Build article path.
+	pathcat(2, fpath, wiki_root, UKI_ARTICLE_ROOT);
+	return UKI_OK;
+}
+
+/**
+ * Gets the path to the templates folder.
+ *
+ * @param  fpath Pre-allocated string buffer to store the templates folder path.
+ * @return       UKI_OK if the operation was successful.
+ */
+int uki_folder_templates(char *fpath) {
+	// Build template path.
+	pathcat(2, fpath, wiki_root, UKI_TEMPLATE_ROOT);
+	return UKI_OK;
+}
+
+/**
  * Gets a error message beased on a error code from uki.
  *
  * @param  ecode Error code.
