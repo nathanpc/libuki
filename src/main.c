@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "uki.h"
 
 // Private methods.
@@ -14,7 +15,7 @@ void usage();
 void print_variables();
 void print_templates_list();
 void print_articles_list();
-
+void print_articles_tree();
 
 /**
  * Application's main entry point.
@@ -57,6 +58,9 @@ int main(const int argc, const char **argv) {
 	// Print the page content.
 	printf("%s\n", content);
 
+	// Print articles tree.
+	print_articles_tree();
+
 	// Clean up and return.
 	uki_clean();
 	return 0;
@@ -80,6 +84,42 @@ void print_variables() {
 		uki_variable_t var = uki_variable(i);
 		printf("   %s <- %s\n", var.key, var.value);
 	}
+	printf("\n");
+}
+
+/**
+ * Prints an articles tree.
+ */
+void print_articles_tree() {
+	char lastparent[UKI_MAX_PATH];
+	lastparent[0] = '\0';
+
+	// TODO: Make this able to traverse directories of any deepness.
+
+	printf("Directory Tree:\n");
+	for (size_t i = 0; i < uki_articles_available(); i++) {
+		uki_article_t article = uki_article(i);
+
+		if (article.parent != NULL) {
+			if (strcmp(lastparent, article.parent) != 0) {
+				strcpy(lastparent, article.parent);
+				printf("   %s\n", lastparent);
+			}
+		} else {
+			if (lastparent[0] != '\0') {
+				lastparent[0] = '\0';
+			}
+		}
+
+		if (article.deepness > 0) {
+			printf("      ");
+		} else {
+			printf("   ");
+		}
+
+		printf("%s\n", article.name);
+	}
+
 	printf("\n");
 }
 
