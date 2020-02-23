@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 3.0)
 # Setup the project.
 project(uki VERSION 1.0.0 LANGUAGES C)
 set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-Wall -Wextra -pedantic)
 
 # Setup the files.
 file(GLOB SOURCES "src/*.c")
