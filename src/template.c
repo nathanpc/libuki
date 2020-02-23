@@ -163,7 +163,8 @@ int populate_templates(uki_template_container *container) {
 
 	// Push the files into the template container.
 	for (i = 0; i < dirlist.size; i++) {
-		add_template(container, dirlist.list[i]);
+		if (file_ext_match(dirlist.list[i], UKI_TEMPLATE_EXT))
+			add_template(container, dirlist.list[i]);
 	}
 
 	// Clean up and return.

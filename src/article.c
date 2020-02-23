@@ -137,7 +137,8 @@ int populate_articles(uki_article_container *container) {
 
 	// Push the files into the article container.
 	for (i = 0; i < dirlist.size; i++) {
-		add_article(container, dirlist.list[i]);
+		if (file_ext_match(dirlist.list[i], UKI_ARTICLE_EXT))
+			add_article(container, dirlist.list[i]);
 	}
 
 	// Clean up and return.

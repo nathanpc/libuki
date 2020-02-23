@@ -497,6 +497,29 @@ size_t slurp_file(char **contents, const char *fname) {
 }
 
 /**
+ * Checks if a file extension is the same as the one specified.
+ *
+ * @param  fpath File path to be checked.
+ * @param  ext   Desired file extension.
+ * @return       TRUE if the file has the desired extension.
+ */
+bool file_ext_match(const char *fpath, const char *ext) {
+	const char *fext;
+	int i;
+
+	// Go through the file path backwards trying to find a dot.
+	fext = fpath;
+	for (i = (strlen(fpath) - 1); i >= 0; i--) {
+		if (fpath[i] == '.') {
+			fext = fpath + i + 1;
+			break;
+		}
+	}
+
+	return strcmp(fext, ext) == 0;
+}
+
+/**
  * Checks if a file exists.
  *
  * @param  fpath File path to be checked.

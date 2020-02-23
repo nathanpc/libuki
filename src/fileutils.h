@@ -22,8 +22,9 @@ typedef struct {
 	char   **list;
 } dirlist_t;
 
-// Existance.
+// Checking.
 bool file_exists(const char *fpath);
+bool file_ext_match(const char *fpath, const char *ext);
 
 // Path manipulaton.
 size_t cleanup_path(char *path);

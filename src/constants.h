@@ -34,8 +34,8 @@
 #define UKI_VARIABLE_PATH "/VARIABLES.uki"
 #define UKI_ARTICLE_ROOT  "/pages/"
 #define UKI_TEMPLATE_ROOT "/templates/"
-#define UKI_ARTICLE_EXT   "html"
-#define UKI_TEMPLATE_EXT  "html"
+#define UKI_ARTICLE_EXT   "htm"
+#define UKI_TEMPLATE_EXT  "htm"
 
 // Variable keys.
 #define UKI_VAR_MAIN_TEMPLATE "main_template"
