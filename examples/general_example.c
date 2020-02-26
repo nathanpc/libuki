@@ -1,6 +1,7 @@
 /**
- * uki
- * A command-line implementation of the uki personal wiki engine.
+ * general_example.c
+ * A simple example to test all the things involved in a Uki personal library
+ * all at once.
  *
  * @author Nathan Campos <hi@nathancampos.me>
  */
@@ -8,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "uki.h"
+#include <uki.h>
 
 // Private methods.
 void usage();
@@ -28,7 +29,7 @@ int main(const int argc, const char **argv) {
 	int uki_error;
 
 	// Check command-line arguments.
-	if (argc == 2) {
+	if (argc != 3) {
 		usage();
 		return 1;
 	}

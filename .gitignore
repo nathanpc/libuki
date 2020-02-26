@@ -1,5 +1,5 @@
 # Test wiki.
-test/
+test-uki/
 
 # Objects and other compilation artifacts.
 *.o

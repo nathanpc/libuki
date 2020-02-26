@@ -8,15 +8,15 @@ everything related to a μki wiki. It's designed to be extremely embeddable.
 ## Library Usage
 
 Using the library couldn't be any simpler. You can check out a more complete
-example by looking at the [`src/main.c`](/src/main.c) file, which contains
-basically anything you might want to do with the library. Anyway, this is a
-simple way to render a page given a `wiki_path` (the root of the μki) and a
-`page_name`:
+example by looking at the [`examples/general_example.c`](/examples/general_example.c)
+file, which contains basically anything you might want to do with the library.
+Anyway, this is a simple way to render a page given a `wiki_path` (the root of
+the μki) and a `page_name`:
 
 ```c
 #include <stdio.h>
 #include <stdlib.h>
-#include "uki.h"
+#include <uki/uki.h>
 
 int uki_error;
 const char *wiki_path = "testwiki/";
@@ -69,11 +69,13 @@ To compile and run this project just follow these simple steps for **UNIX**
 systems:
 
 ```console
-foo@bar:~/testuki$ cd libuki
-foo@bar:~/testuki/libuki$ make
-foo@bar:~/testuki/libuki$ cd ..
-foo@bar:~/testuki$ gcc -Llibuki/build/lib -o testuki test.c -luki
-foo@bar:~/testuki$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH ./testuki
+foo@bar:~/testuki$ mkdir libuki/build
+foo@bar:~/testuki/libuki$ cd libuki/build
+foo@bar:~/testuki/libuki/build$ cmake ..
+foo@bar:~/testuki/libuki/build$ make install
+foo@bar:~/testuki/libuki/build$ cd ..
+foo@bar:~/testuki$ gcc -o testuki test.c -luki
+foo@bar:~/testuki$ ./testuki
 ```
 
 If you're running **Windows** it's just a matter of opening the Visual Studio
