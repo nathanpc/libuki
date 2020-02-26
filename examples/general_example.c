@@ -17,6 +17,7 @@ void print_variables();
 void print_templates_list();
 void print_articles_list();
 void print_articles_tree();
+void print_page(const char *page_path);
 
 /**
  * Application's main entry point.
@@ -47,20 +48,11 @@ int main(const int argc, const char **argv) {
 	print_templates_list();
 	print_articles_list();
 
-	// Render a page.
-	char *content;
-	if ((uki_error = uki_render_page(&content, argv[2])) != UKI_OK) {
-		fprintf(stderr, "ERROR: %s", uki_error_msg(uki_error));
-		uki_clean();
-
-		return 1;
-	}
-
-	// Print the page content.
-	printf("%s\n", content);
-
-	// Print articles tree.
+	// Print trees.
 	print_articles_tree();
+
+	// Print content.
+	print_page(argv[2]);
 
 	// Clean up and return.
 	uki_clean();
@@ -162,6 +154,25 @@ void print_articles_list() {
 	}
 
 	printf("\n");
+}
+
+/**
+ * Prints a fully rendered page.
+ *
+ * @param page_path Relative page to the article path.
+ */
+void print_page(const char *page_path) {
+	char *content;
+	int err;
+
+	if ((err = uki_render_page(&content, page_path)) != UKI_OK) {
+		fprintf(stderr, "ERROR: %s", uki_error_msg(err));
+		uki_clean();
+		exit(EXIT_FAILURE);
+	}
+
+	// Print the page content.
+	printf("%s\n", content);
 }
 
 /**
