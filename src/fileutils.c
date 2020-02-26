@@ -492,7 +492,7 @@ size_t slurp_file(char **contents, const char *fname) {
 	fclose(fh);
 
 	// Make sure our string is properly terminated and return.
-	(*contents)[nread - 1] = '\0';
+	(*contents)[nread] = '\0';
 	return nread;
 }
 
