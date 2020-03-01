@@ -85,6 +85,56 @@ int uki_initialize(const char *wiki_path) {
 }
 
 /**
+ * Renders an article from its text contents.
+ *
+ * @param  content  Content to be rendered. (Reallocated by this function)
+ * @param  deepness Article index.
+ * @return          UKI_OK if the operation was successful.
+ */
+int uki_render_article_from_text(char **content, const int deepness) {
+	return substitute_assets(content, deepness);
+}
+
+/**
+ * Renders an article by its index.
+ *
+ * @param  rendered Rendered page contents (Allocated by this fuction).
+ * @param  index    Article index.
+ * @param  preview  Is this for preview? (Will change the contents of the page)
+ * @return          UKI_OK if the operation was successful.
+ */
+int uki_render_article(char **rendered, const size_t index,
+					   const bool preview) {
+	uki_article_t article;
+	char fpath[UKI_MAX_PATH];
+	int err;
+
+	// Get the article.
+	article = uki_article(index);
+	if (article.name == NULL)
+		return UKI_ERROR_INDEX_NOT_FOUND;
+
+	// Get the file path.
+	if ((err = uki_article_fpath(fpath, article)) != UKI_OK)
+		return err;
+
+	// Check if there is an article there.
+	if (!file_exists(fpath))
+		return UKI_ERROR_NOARTICLE;
+
+	// Slurp file.
+	slurp_file(rendered, fpath);
+	if (rendered == NULL)
+		return UKI_ERROR_PARSING_ARTICLE;
+
+	// Substitute asset paths if we are in preview mode.
+	if (preview)
+		return uki_render_article_from_text(rendered, article.deepness);
+
+	return UKI_OK;
+}
+
+/**
  * Render a wiki page.
  *
  * @param  rendered Rendered page text (will be allocated by this function).
@@ -107,7 +157,7 @@ int uki_render_page(char **rendered, const char *page) {
 	// Build article path and render it.
 	pathcat(3, article_path, wiki_root, UKI_ARTICLE_ROOT, page);
 	extcat(article_path, UKI_ARTICLE_EXT);
-	if ((err = render_article(rendered, article_path)) != UKI_OK)
+	if ((err = render_article_in_template(rendered, article_path)) != UKI_OK)
 		return err;
 
 	return render_variables(rendered, variables);
@@ -277,6 +327,8 @@ const char* uki_error_msg(const int ecode) {
 		return "Template file not found.\n";
 	case UKI_ERROR_NOMAINTEMPLATE:
 		return "No 'main_template' variable set in the manifest.\n";
+	case UKI_ERROR_INDEX_NOT_FOUND:
+		return "Index to template/article not found.\n";
 	case UKI_ERROR_VARIABLE_NOTFOUND:
 		return "Variable not found.\n";
 	case UKI_ERROR_BODYVAR_NOTFOUND:
@@ -297,6 +349,8 @@ const char* uki_error_msg(const int ecode) {
 		return "String conversion from ASCII to Unicode failed\n";
 	case UKI_ERROR_CONVERSION_WA:
 		return "String conversion from Unicode to ASCII failed\n";
+	case UKI_ERROR_REGEX_ASSET_IMAGE:
+		return "There was a regex failure while substituting image assets.\n";
 	case UKI_ERROR:
 		return "General error.\n";
 	}

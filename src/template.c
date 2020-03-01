@@ -8,6 +8,7 @@
 #include "constants.h"
 #include "template.h"
 #include "fileutils.h"
+#include "strutils.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,14 +30,7 @@
 const char *wiki_root_path;
 char template_path[UKI_MAX_PATH];
 
-// Position structure.
-typedef struct {
-	size_t begin;
-	size_t end;
-} spos_t;
-
 // Private methods.
-spos_t substpos(const char *haystack, const char *needle, const uint8_t type);
 void replace_string(char **haystack, const char *needle, const char *substr,
 					const uint8_t type);
 int substitute_templates(char **template);
@@ -306,7 +300,7 @@ int render_variables(char **filled_template,
  * @param  path            Article page absolute path.
  * @return                 UKI_OK when the substitution was successful.
  */
-int render_article(char **filled_template, const char *path) {
+int render_article_in_template(char **filled_template, const char *path) {
 	char *article;
 
 	// Check if there is an article there.
@@ -335,47 +329,11 @@ int render_article(char **filled_template, const char *path) {
  * @param haystack String that will have its contents changed.
  * @param needle   What we want to find inside.
  * @param substr   Substitute string to be added to the base string.
- * @param  type     Is this a template or variable substitution?
+ * @param type     Is this a template or variable substitution?
  */
 void replace_string(char **haystack, const char *needle, const char *substr,
 					const uint8_t type) {
-	char *left;
-	char *right;
-	spos_t pos = substpos(*haystack, needle, type);
-
-	// Allocate memory for our left and right side strings.
-	left = (char*)malloc((pos.begin + 1) * sizeof(char));
-	right = (char*)malloc((strlen(*haystack) - pos.end + 1) * sizeof(char));
-
-	// Populate our left and right side strings.
-	memcpy(left, *haystack, pos.begin);
-	left[pos.begin] = '\0';
-	strcpy(right, *haystack + pos.end);
-
-	// Reallocate memory for our substituted string and copy its contents.
-	*haystack = (char*)realloc(*haystack, (strlen(left) + strlen(right) +
-										   strlen(substr) + 1) * sizeof(char));
-	strcpy(*haystack, left);
-	strcpy(*haystack + strlen(left), substr);
-	strcpy(*haystack + strlen(left) + strlen(substr), right);
-
-	// Clean up our mess.
-	free(left);
-	free(right);
-}
-
-/**
- * Gets a substitution candidate positions.
- *
- * @param  haystack Text containing the candidate substring.
- * @param  needle   What we want to find inside.
- * @param  type     Is this a template or variable substitution?
- * @return          Position of the string inside the haystack.
- */
-spos_t substpos(const char *haystack, const char *needle, const uint8_t type) {
-	spos_t pos;
 	char cmpneedle[UKI_MAX_TEMPLATE_NAME + 3];
-	char *occur;
 
 	// Build comparison needle.
 	if (type == SUBSTITUTE_TEMPLATE) {
@@ -386,15 +344,6 @@ spos_t substpos(const char *haystack, const char *needle, const uint8_t type) {
 		strncpy(cmpneedle, needle, UKI_MAX_TEMPLATE_NAME);
 	}
 
-	// Get substring position.
-	occur = strstr(haystack, cmpneedle);
-	if (occur != NULL) {
-		pos.begin = (size_t)(occur - haystack);
-		pos.end = pos.begin + strlen(cmpneedle);
-	} else {
-		pos.begin = 0;
-		pos.end = 0;
-	}
-
-	return pos;
+	// Replace the string.
+	strsreplace(haystack, cmpneedle, substr);
 }

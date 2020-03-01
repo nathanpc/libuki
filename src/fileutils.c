@@ -6,6 +6,7 @@
  */
 
 #include "fileutils.h"
+#include "strutils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -14,16 +15,77 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <dirent.h>
+#include <regex.h>
 #endif
 
 // Private methods.
 #ifdef WINDOWS
-int __cdecl sort_dirs_ascending (const void *a, const void *b);
+int __cdecl sort_dirs_ascending(const void *a, const void *b);
 #else
-int sort_dirs_ascending (const void *a, const void *b);
+int sort_dirs_ascending(const void *a, const void *b);
 #endif
 ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
 							   const char *path, const bool recursive);
+
+/**
+ * Substitutes assets paths inside a HTML page to map to the Uki assets folder.
+ *
+ * @param  html     HTML page content.
+ * @param  deepness How deep inside the articles folder is this article.
+ * @return          UKI_OK if the substitutions were made successfully.
+ */
+int substitute_assets(char **html, const int deepness) {
+	regex_t regex;
+	char *cursor;
+	int err;
+	regmatch_t pmatch[2];
+    size_t nmatch = 2;
+
+	// Compile the image asset regex.
+	if ((err = regcomp(&regex, "<img\\s+src=\"([^\"]+)\"",
+					   REG_EXTENDED | REG_ICASE)) != 0)
+		return UKI_ERROR_REGEX_ASSET_IMAGE;
+
+	// Go through the content looking for matches.
+	cursor = *html;
+	while (regexec(&regex, cursor, nmatch, pmatch, 0) == 0) {
+		int ibp;
+		spos_t pos;
+		size_t mlen;
+		size_t lppos;
+		char oldpath[UKI_MAX_PATH];
+		char newpath[UKI_MAX_PATH];
+		char backpath[UKI_MAX_PATH];
+
+		// Store the last cursor position.
+		lppos = cursor - *html;
+
+		// Get the old path.
+		mlen = pmatch[1].rm_eo - pmatch[1].rm_so;
+		strncpy(oldpath, cursor + pmatch[1].rm_so, mlen);
+		oldpath[mlen] = '\0';
+
+		// Create the backwards path.
+		backpath[0] = '\0';
+		for (ibp = -1; ibp < deepness; ibp++) {
+			strcat(backpath, "../");
+		}
+
+		// Create a subsitution position structure.
+		pos.begin = (size_t)(lppos + pmatch[1].rm_so);
+		pos.end = (size_t)(lppos + pmatch[1].rm_eo);
+
+		// Build the new path and substitute it in the page.
+		pathcat(3, newpath, backpath, UKI_ASSETS_ROOT, oldpath);
+		strnreplace(html, pos, newpath);
+
+		// Skip out cursor to the end of the substituted string.
+		cursor = *html + lppos + pmatch[1].rm_so + strlen(newpath);
+	}
+
+	regfree(&regex);
+	return UKI_OK;
+}
 
 /**
  * Gets the parent folder from a path.

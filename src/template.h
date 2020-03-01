@@ -43,7 +43,7 @@ uki_template_t find_template_i(const size_t index,
 
 // Rendering.
 int render_template(char **rendered, const char *template_name);
-int render_article(char **filled_template, const char *path);
+int render_article_in_template(char **filled_template, const char *path);
 int render_variables(char **filled_template,
 					 const uki_variable_container variables);
 

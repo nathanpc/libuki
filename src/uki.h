@@ -53,6 +53,11 @@ DLL_API int uki_folder_articles(char *fpath);
 DLL_API int uki_folder_templates(char *fpath);
 
 // Rendering.
+DLL_API int uki_render_article_from_text(char **content, const int deepness);
+DLL_API int uki_render_article(char **rendered, const size_t index,
+							   const bool preview);
+DLL_API int uki_render_template(char **rendered, const size_t index,
+								const bool preview);
 DLL_API int uki_render_page(char **rendered, const char *page);
 
 #endif /* _UKI_H_ */
