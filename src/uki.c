@@ -88,10 +88,21 @@ int uki_initialize(const char *wiki_path) {
  * Renders an article from its text contents.
  *
  * @param  content  Content to be rendered. (Reallocated by this function)
- * @param  deepness Article index.
+ * @param  deepness Article deepness inside the articles folder.
  * @return          UKI_OK if the operation was successful.
  */
 int uki_render_article_from_text(char **content, const int deepness) {
+	return substitute_assets(content, deepness);
+}
+
+/**
+ * Renders a template from its text contents.
+ *
+ * @param  content  Content to be rendered. (Reallocated by this function)
+ * @param  deepness Template deepness inside the templates folder.
+ * @return          UKI_OK if the operation was successful.
+ */
+int uki_render_template_from_text(char **content, const int deepness) {
 	return substitute_assets(content, deepness);
 }
 
