@@ -34,10 +34,10 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
  * @param  deepness How deep inside the articles folder is this article.
  * @return          UKI_OK if the substitutions were made successfully.
  */
-int substitute_assets(char **html, const int deepness) {
+uki_error substitute_assets(char **html, const int deepness) {
 	regex_t regex;
 	char *cursor;
-	int err;
+	uki_error err;
 	regmatch_t pmatch[2];
     size_t nmatch = 2;
 

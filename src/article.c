@@ -124,7 +124,7 @@ uki_article_t add_article(uki_article_container *container, const char *fpath) {
  * @param  container Articles container.
  * @return           UKI_OK if the operation was successful.
  */
-int populate_articles(uki_article_container *container) {
+uki_error populate_articles(uki_article_container *container) {
 	dirlist_t dirlist;
 	int err;
 	size_t i;

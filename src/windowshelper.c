@@ -46,10 +46,10 @@ void PrintDebug(const char* format, ...) {
 BOOL StringAtoW(LPTSTR szUnicode, const char *szASCII) {
 	size_t nLen = strlen(szASCII) + 1;
 
-    if(MultiByteToWideChar(CP_ACP, 0, szASCII, -1, szUnicode, nLen) == 0) {
+    if (MultiByteToWideChar(CP_ACP, 0, szASCII, -1, szUnicode, nLen) == 0) {
 		return FALSE;
     }
-    
+
     return TRUE;
 }
 
@@ -63,7 +63,7 @@ BOOL StringAtoW(LPTSTR szUnicode, const char *szASCII) {
 BOOL StringWtoA(char *szASCII, LPCTSTR szUnicode) {
 	size_t nLen = wcslen(szUnicode) + 1;
 
-    if(WideCharToMultiByte(CP_ACP, 0, szUnicode, -1, szASCII, nLen,
+    if (WideCharToMultiByte(CP_ACP, 0, szUnicode, -1, szASCII, nLen,
 		NULL, NULL) == 0) {
 		DWORD err = GetLastError();
 		return FALSE;

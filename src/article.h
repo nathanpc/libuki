@@ -9,6 +9,7 @@
 #define _ARTICLE_H_
 
 #include "windowshelper.h"
+#include "constants.h"
 #ifdef UNIX
 #include <stdlib.h>
 #include <stdint.h>
@@ -32,7 +33,7 @@ typedef struct {
 void initialize_articles(uki_article_container *container,
 						 const char *_wiki_root);
 uki_article_t add_article(uki_article_container *container, const char *fpath);
-int populate_articles(uki_article_container *container);
+uki_error populate_articles(uki_article_container *container);
 void free_articles(uki_article_container container);
 
 // Lookup.

@@ -43,6 +43,6 @@ ssize_t list_directory_files(dirlist_t *list, const char *path,
 // File content.
 long file_contents_size(const char *fname);
 size_t slurp_file(char **contents, const char *fname);
-int substitute_assets(char **html, const int deepness);
+uki_error substitute_assets(char **html, const int deepness);
 
 #endif /* _FILEUTILS_H_ */

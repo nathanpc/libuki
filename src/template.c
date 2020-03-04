@@ -33,7 +33,7 @@ char template_path[UKI_MAX_PATH];
 // Private methods.
 void replace_string(char **haystack, const char *needle, const char *substr,
 					const uint8_t type);
-int substitute_templates(char **template);
+uki_error substitute_templates(char **template);
 void populate_template_from_path(uki_template_t *template, const char *fpath);
 void push_template(uki_template_container *container, uki_template_t template);
 
@@ -144,9 +144,9 @@ uki_template_t add_template(uki_template_container *container,
  * @param  container Template container.
  * @return           UKI_OK if the operation was successful.
  */
-int populate_templates(uki_template_container *container) {
+uki_error populate_templates(uki_template_container *container) {
 	dirlist_t dirlist;
-	int err;
+	uki_error err;
 	size_t i;
 
 	// Go through the directory and sort the findings.
@@ -189,10 +189,10 @@ void free_templates(uki_template_container container) {
  * @param  template Template file contents.
  * @return          UKI_OK when all the substitutions were successful.
  */
-int substitute_templates(char **template) {
+uki_error substitute_templates(char **template) {
 	char fname[UKI_MAX_TEMPLATE_NAME];
 	char *ntemp;
-	int err;
+	uki_error err;
 	int nmatches;
 
 	// Try to find a template tag.
@@ -230,7 +230,7 @@ int substitute_templates(char **template) {
  * @param  template_name The template file to be rendered.
  * @return               UKI_OK if the rendering went smoothly.
  */
-int render_template(char **rendered, const char *template_name) {
+uki_error render_template(char **rendered, const char *template_name) {
 	// Build template path.
 	char template_path[UKI_MAX_PATH];
 	pathcat(3, template_path, wiki_root_path, UKI_TEMPLATE_ROOT, template_name);
@@ -257,11 +257,11 @@ int render_template(char **rendered, const char *template_name) {
  * @return                 UKI_OK when all the substitutions were successful.
  */
 int render_variables(char **filled_template,
-					const uki_variable_container variables) {
+					 const uki_variable_container variables) {
 	char vname[VARIABLE_KEY_MAX_CHAR];
 	int ivar;
 	int nmatches;
-	int err;
+	uki_error err;
 
 	// Try to find a variable tag.
 	nmatches = sscanf(*filled_template, TEMPLATE_VAR_MATCH, vname);
@@ -300,7 +300,7 @@ int render_variables(char **filled_template,
  * @param  path            Article page absolute path.
  * @return                 UKI_OK when the substitution was successful.
  */
-int render_article_in_template(char **filled_template, const char *path) {
+uki_error render_article_in_template(char **filled_template, const char *path) {
 	char *article;
 
 	// Check if there is an article there.

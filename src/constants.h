@@ -10,6 +10,9 @@
 
 #include "windowshelper.h"
 
+// Type definitions.
+typedef int uki_error;
+
 // Return codes.
 #define UKI_OK    1
 #define UKI_ERROR 0

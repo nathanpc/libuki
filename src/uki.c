@@ -24,8 +24,9 @@ uki_article_container articles;
 uki_template_container templates;
 
 // Private methods.
-int populate_variable_container(const char *wiki_root, const char *var_fname,
-								uki_variable_container *container);
+uki_error populate_variable_container(const char *wiki_root,
+									  const char *var_fname,
+									  uki_variable_container *container);
 
 #ifdef WINDOWS
 /**
@@ -55,8 +56,8 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
  * @param  wiki_path Path to the root of the uki wiki.
  * @return           UKI_OK if the initialization was completed successfully.
  */
-int uki_initialize(const char *wiki_path) {
-	int err;
+uki_error uki_initialize(const char *wiki_path) {
+	uki_error err;
 	uki_initialized = true;
 
 	// Copy the wiki root path string.
@@ -91,7 +92,7 @@ int uki_initialize(const char *wiki_path) {
  * @param  deepness Article deepness inside the articles folder.
  * @return          UKI_OK if the operation was successful.
  */
-int uki_render_article_from_text(char **content, const int deepness) {
+uki_error uki_render_article_from_text(char **content, const int deepness) {
 	return substitute_assets(content, deepness);
 }
 
@@ -102,7 +103,7 @@ int uki_render_article_from_text(char **content, const int deepness) {
  * @param  deepness Template deepness inside the templates folder.
  * @return          UKI_OK if the operation was successful.
  */
-int uki_render_template_from_text(char **content, const int deepness) {
+uki_error uki_render_template_from_text(char **content, const int deepness) {
 	return substitute_assets(content, deepness);
 }
 
@@ -114,11 +115,11 @@ int uki_render_template_from_text(char **content, const int deepness) {
  * @param  preview  Is this for preview? (Will change the contents of the page)
  * @return          UKI_OK if the operation was successful.
  */
-int uki_render_article(char **rendered, const size_t index,
-					   const bool preview) {
+uki_error uki_render_article(char **rendered, const size_t index,
+							 const bool preview) {
 	uki_article_t article;
 	char fpath[UKI_MAX_PATH];
-	int err;
+	uki_error err;
 
 	// Get the article.
 	article = uki_article(index);
@@ -152,9 +153,9 @@ int uki_render_article(char **rendered, const size_t index,
  * @param  page     Relative path to the page (without the extension).
  * @return          UKI_OK if there were no errors.
  */
-int uki_render_page(char **rendered, const char *page) {
+uki_error uki_render_page(char **rendered, const char *page) {
 	char article_path[UKI_MAX_PATH];
-	int err;
+	uki_error err;
 
 	// Get main template.
 	int idx = find_variable(UKI_VAR_MAIN_TEMPLATE, configs);
@@ -277,7 +278,7 @@ uki_template_t uki_add_template(const char *template_path) {
  * @param  article Article structure.
  * @return         UKI_OK if the operation was successful.
  */
-int uki_article_fpath(char *fpath, const uki_article_t article) {
+uki_error uki_article_fpath(char *fpath, const uki_article_t article) {
 	// Build article path.
 	pathcat(3, fpath, wiki_root, UKI_ARTICLE_ROOT, article.path);
 	return UKI_OK;
@@ -290,7 +291,7 @@ int uki_article_fpath(char *fpath, const uki_article_t article) {
  * @param  template Template structure.
  * @return          UKI_OK if the operation was successful.
  */
-int uki_template_fpath(char *fpath, const uki_template_t template) {
+uki_error uki_template_fpath(char *fpath, const uki_template_t template) {
 	// Build template path.
 	pathcat(3, fpath, wiki_root, UKI_TEMPLATE_ROOT, template.path);
 	return UKI_OK;
@@ -302,7 +303,7 @@ int uki_template_fpath(char *fpath, const uki_template_t template) {
  * @param  fpath Pre-allocated string buffer to store the articles folder path.
  * @return       UKI_OK if the operation was successful.
  */
-int uki_folder_articles(char *fpath) {
+uki_error uki_folder_articles(char *fpath) {
 	// Build article path.
 	pathcat(2, fpath, wiki_root, UKI_ARTICLE_ROOT);
 	return UKI_OK;
@@ -314,7 +315,7 @@ int uki_folder_articles(char *fpath) {
  * @param  fpath Pre-allocated string buffer to store the templates folder path.
  * @return       UKI_OK if the operation was successful.
  */
-int uki_folder_templates(char *fpath) {
+uki_error uki_folder_templates(char *fpath) {
 	// Build template path.
 	pathcat(2, fpath, wiki_root, UKI_TEMPLATE_ROOT);
 	return UKI_OK;
@@ -326,7 +327,7 @@ int uki_folder_templates(char *fpath) {
  * @param  ecode Error code.
  * @return       Error message.
  */
-const char* uki_error_msg(const int ecode) {
+const char* uki_error_msg(const uki_error ecode) {
 	switch (ecode) {
 	case UKI_ERROR_NOMANIFEST:
 		return "No manifest file found in the provided path.\n";
@@ -390,7 +391,7 @@ void uki_clean() {
  * @return           UKI_OK if the operation was successful. Respective error
  *                   code otherwise.
  */
-int populate_variable_container(const char *wiki_root, const char *var_fname,
+uki_error populate_variable_container(const char *wiki_root, const char *var_fname,
 								uki_variable_container *container) {
 	// Get path string length and allocate some memory.
 	size_t path_len = strlen(wiki_root) + 1 + strlen(var_fname);
