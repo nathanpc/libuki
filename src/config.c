@@ -33,9 +33,9 @@ void initialize_variables(uki_variable_container *container) {
  */
 bool populate_variables(uki_variable_container *container, const char *fname) {
 	FILE *fh;
+	ssize_t read;
 	char *line = NULL;
 	size_t len = 0;
-	ssize_t read;
 
 	// Open file for reading.
 	fh = fopen(fname, "r");

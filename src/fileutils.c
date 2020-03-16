@@ -268,28 +268,23 @@ size_t extcat(char *final_path, const char *ext) {
  */
 size_t cleanup_path(char *path) {
 	char *pos;
+	char *back;
 
 	// Go through string searching for duplicate slashes.
 	while ((pos = strstr(path, "//")) != NULL) {
-		// Yay! Pointer shenanigans!
-		pos++;
-		*pos = '\0';
-		pos++;
-
-		// Append the rest of the string into itselt.
-		strcat(path, pos);
+		// Append the rest of the string skipping one character.
+		for (back = pos++; *back != '\0'; back++) {
+			*back = *pos++;
+		}
 	}
 
 #ifdef WINDOWS
 	// Fix strings that have a mix of Windows and UNIX slashes together.
 	while ((pos = strstr(path, "\\/")) != NULL) {
-		// Yay! Pointer shenanigans!
-		pos++;
-		*pos = '\0';
-		pos++;
-
-		// Append the rest of the string into itselt.
-		strcat(path, pos);
+		// Append the rest of the string skipping one character.
+		for (back = pos++; *back != '\0'; back++) {
+			*back = *pos++;
+		}
 	}
 
 	// Convert UNIX path separators to Windows.

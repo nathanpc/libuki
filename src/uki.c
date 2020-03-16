@@ -379,6 +379,7 @@ void uki_clean() {
 		free_variables(configs);
 		free_variables(variables);
 		free_articles(articles);
+		free_templates(templates);
 	}
 }
 
@@ -386,7 +387,7 @@ void uki_clean() {
  * Populates a variable/configuration container.
  *
  * @param  wiki_root Path to the root of the uki wiki.
- * @param  var_fname Path to the variabl/configuration file.
+ * @param  var_fname Path to the variable/configuration file.
  * @param  container Variable container.
  * @return           UKI_OK if the operation was successful. Respective error
  *                   code otherwise.
@@ -394,7 +395,7 @@ void uki_clean() {
 uki_error populate_variable_container(const char *wiki_root, const char *var_fname,
 								uki_variable_container *container) {
 	// Get path string length and allocate some memory.
-	size_t path_len = strlen(wiki_root) + 1 + strlen(var_fname);
+	size_t path_len = strlen(wiki_root) + strlen(var_fname) + 2;
 	char *var_path = (char*)malloc(path_len * sizeof(char));
 
 	// Build the wiki variables file path and check for its existance.
@@ -411,5 +412,6 @@ uki_error populate_variable_container(const char *wiki_root, const char *var_fna
 		return UKI_ERROR_PARSING_VARIABLES;
 	}
 
+	free(var_path);
 	return UKI_OK;
 }

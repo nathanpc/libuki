@@ -317,9 +317,12 @@ uki_error render_article_in_template(char **filled_template, const char *path) {
 	if (article == NULL)
 		return UKI_ERROR_PARSING_ARTICLE;
 
-	// Replace the body variable and return.
+	// Replace the body variable
 	replace_string(filled_template, TEMPLATE_BODY_MATCH, article,
 				   SUBSTITUTE_STRING);
+
+	// Free the slurped article and return.
+	free(article);
 	return UKI_OK;
 }
 
