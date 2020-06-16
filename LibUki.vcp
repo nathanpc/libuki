@@ -738,7 +738,87 @@ DEP_CPP_FILEU=\
 DEP_CPP_FILEU=\
 	".\src\constants.h"\
 	".\src\fileutils.h"\
+	".\src\strutils.h"\
 	".\src\windowshelper.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\strutils.c
+
+!IF  "$(CFG)" == "LibUki - Win32 (WCE MIPS) Release"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH4) Release"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH4) Debug"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH3) Release"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE SH3) Debug"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE ARM) Release"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE ARM) Debug"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86) Release"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86) Debug"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86em) Release"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
+	
+
+!ELSEIF  "$(CFG)" == "LibUki - Win32 (WCE x86em) Debug"
+
+DEP_CPP_STRUT=\
+	".\src\strutils.h"\
 	
 
 !ENDIF 
@@ -864,6 +944,7 @@ DEP_CPP_TEMPL=\
 	".\src\config.h"\
 	".\src\constants.h"\
 	".\src\fileutils.h"\
+	".\src\strutils.h"\
 	".\src\template.h"\
 	".\src\windowshelper.h"\
 	
@@ -1109,6 +1190,10 @@ SOURCE=.\src\constants.h
 # Begin Source File
 
 SOURCE=.\src\fileutils.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\strutils.h
 # End Source File
 # Begin Source File
 
