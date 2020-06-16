@@ -35,6 +35,8 @@ ssize_t n_list_directory_files(size_t init_count, dirlist_t *list,
  * @return          UKI_OK if the substitutions were made successfully.
  */
 uki_error substitute_assets(char **html, const int deepness) {
+#ifdef WINDOWS
+#else
 	regex_t regex;
 	char *cursor;
 	uki_error err;
@@ -84,6 +86,7 @@ uki_error substitute_assets(char **html, const int deepness) {
 	}
 
 	regfree(&regex);
+#endif
 	return UKI_OK;
 }
 
